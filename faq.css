@@ -1,0 +1,9 @@
+.faq{margin:28px 0;border-top:1px solid var(--rule)}
+.faq details{border-bottom:1px solid var(--rule)}
+.faq summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:16px 0;font-family:var(--serif);font-weight:700;letter-spacing:.04em}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"";flex:none;width:8px;height:8px;border-right:1.5px solid var(--gold);border-bottom:1.5px solid var(--gold);transform:translateY(-3px) rotate(45deg);transition:transform .3s}
+.faq details[open] summary::after{transform:translateY(1px) rotate(-135deg)}
+.faq summary:hover{color:var(--lamp)}
+.faq details p{margin:0 0 18px;color:#d0cbbd;font-size:.95rem}
+.faq details[open] p{animation:rise .4s ease-out both}
