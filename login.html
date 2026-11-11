@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="登入夜燈命書會員，查看你的命書、追問與常用生辰。">
+<meta name="theme-color" content="#05070d">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<title>登入｜夜燈命書</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700;900&family=Noto+Sans+TC:wght@400;500;700&family=LXGW+WenKai+TC:wght@700&display=swap">
+<link rel="stylesheet" href="legal.css">
+<link rel="stylesheet" href="app.css">
+</head>
+<body class="app">
+<header class="top"><a class="brand" href="/">夜燈命書</a>
+<nav class="nav" aria-label="主選單"><a href="/">命書與價格</a><a href="faq.html">常見問題</a><a href="account.html">會員</a></nav></header>
+<main class="doc">
+
+<div class="doc-head"><h1>點燈入內</h1><p class="lead">登入後可以重看買過的命書、使用追問、保存常用生辰。不登入也能購買，用同一個 Email 登入後，舊訂單會自動出現。</p></div>
+<section class="panel" aria-labelledby="h-login">
+<h2 id="h-login">用 Email 登入</h2>
+<form id="f-email" class="stack" novalidate>
+<div class="field"><label for="email">Email</label><input id="email" type="email" inputmode="email" autocomplete="email" required placeholder="you@example.com"></div>
+<button class="btn primary" type="submit">寄登入信給我</button>
+</form>
+<form id="f-otp" class="stack" hidden novalidate>
+<p class="msg">信已經寄到 <b id="sent-to"></b>。點信裡的連結就能登入；如果信裡有 6 位數驗證碼，也可以直接輸入。</p>
+<div class="field"><label for="otp">驗證碼</label><input id="otp" class="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}"></div>
+<button class="btn primary" type="submit">登入</button>
+<button class="btn ghost" type="button" id="resend">重新輸入 Email</button>
+</form>
+<p class="msg" id="m-email" role="alert"></p>
+<div class="or">或</div>
+<div class="stack">
+<button class="btn google" type="button" id="b-google">使用 Google 登入</button>
+<a class="btn line" id="b-line" href="#">使用 LINE 登入</a>
+</div>
+<p class="msg">登入即表示你同意<a href="terms.html">服務條款</a>與<a href="privacy.html">隱私權政策</a>。</p>
+</section>
+</main>
+<footer>
+<span class="seal" aria-hidden="true"><span>夜燈</span><span>命書</span></span>
+<div>
+<nav aria-label="網站資訊"><a href="/">命書與價格</a><a href="faq.html">常見問題</a><a href="terms.html">服務條款</a><a href="privacy.html">隱私權政策</a><a href="refund.html">退款政策</a></nav>
+<p>夜燈命書　客服信箱：<span class="mail">service@yedeng.tw</span></p>
+<p>命盤依紫微斗數傳統規則計算，解讀僅供參考與娛樂。</p>
+</div>
+</footer>
+<script src="yd.js"></script>
+<script>
+
+(function(){
+  var p=new URLSearchParams(location.search), next=YD.safeNext(p.get("next")), $=YD.$, m=$("#m-email");
+  var bind=p.get("mode")==="bind", ex=bind?"/auth/link-email":"/auth/session", back=location.origin+"/login.html?"+(bind?"mode=bind&":"")+"next="+encodeURIComponent(next);
+  if(bind){$("#h-login").textContent="綁定 Email";$(".or").hidden=true;$("#b-google").hidden=true;$("#b-line").hidden=true;}
+  if(p.get("error")==="line"){m.className="msg bad";m.textContent="LINE 登入沒有完成，請再試一次。";}
+  $("#b-line").href=YD.cfg.api+"/auth/line/start?next="+encodeURIComponent(next);
+  function done(){location.replace(next);}
+  // 已經登入就直接過去；從 Email 連結或 Google 回來時，把登入換成本站 session
+  function tryExchange(){YD.exchange(ex).then(function(ok){if(ok)done();}).catch(function(e){m.className="msg bad";m.textContent=e.message;});}
+  if(bind) tryExchange(); else YD.api("/me").then(done,tryExchange);
+  var email="";
+  $("#f-email").addEventListener("submit",function(ev){
+    ev.preventDefault(); email=$("#email").value.trim().toLowerCase();
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(email)){m.className="msg bad";m.textContent="Email 格式不正確";return;}
+    var b=ev.submitter||this.querySelector("button"); YD.busy(b,true,"寄送中…"); m.textContent="";
+    YD.sb().then(function(c){return c.auth.signInWithOtp({email:email,options:{emailRedirectTo:back}});})
+    .then(function(r){ if(r.error) throw r.error;
+      $("#sent-to").textContent=email; $("#f-email").hidden=true; $("#f-otp").hidden=false; $("#otp").focus(); })
+    .catch(function(e){m.className="msg bad";m.textContent=/rate|seconds/i.test(e.message||"")?"寄太頻繁了，請等一分鐘再試":"寄送失敗，請稍後再試";})
+    .then(function(){YD.busy(b,false);});
+  });
+  $("#f-otp").addEventListener("submit",function(ev){
+    ev.preventDefault(); var code=$("#otp").value.replace(/\D/g,"");
+    if(code.length!==6){m.className="msg bad";m.textContent="請輸入 6 位數驗證碼";return;}
+    var b=ev.submitter||this.querySelector("button[type=submit]"); YD.busy(b,true,"登入中…");
+    YD.sb().then(function(c){return c.auth.verifyOtp({email:email,token:code,type:"email"});})
+    .then(function(r){if(r.error) throw r.error; return YD.exchange(ex);})
+    .then(function(ok){if(ok)done();})
+    .catch(function(){m.className="msg bad";m.textContent="驗證碼不正確或已過期";YD.busy(b,false);});
+  });
+  $("#resend").addEventListener("click",function(){$("#f-otp").hidden=true;$("#f-email").hidden=false;m.textContent="";});
+  $("#b-google").addEventListener("click",function(){
+    YD.sb().then(function(c){return c.auth.signInWithOAuth({provider:"google",options:{redirectTo:back}});})
+    .catch(function(e){m.className="msg bad";m.textContent=e.message;});
+  });
+})();
+
+</script>
+</body>
+</html>

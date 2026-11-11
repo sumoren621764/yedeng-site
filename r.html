@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="夜燈命書閱讀頁。">
+<meta name="theme-color" content="#05070d">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<title>我的命書｜夜燈命書</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700;900&family=Noto+Sans+TC:wght@400;500;700&family=LXGW+WenKai+TC:wght@700&display=swap">
+<link rel="stylesheet" href="legal.css">
+<link rel="stylesheet" href="app.css">
+</head>
+<body class="app">
+<header class="top"><a class="brand" href="/">夜燈命書</a>
+<nav class="nav" aria-label="主選單"><a href="/">命書與價格</a><a href="faq.html">常見問題</a><a href="account.html">會員</a></nav></header>
+<main class="doc">
+
+<div class="doc-head"><h1 id="title">你的命書</h1><p class="lead" id="lead">打開中…</p></div>
+<section class="panel" id="ready" hidden>
+<div class="stack"><a class="btn primary" id="b-open" target="_blank" rel="noopener">閱讀命書（PDF）</a><a class="btn ghost" id="b-dl">下載保存</a></div>
+<p class="msg">下載連結 10 分鐘內有效，過期重新整理這一頁就好。這個頁面的網址只屬於你，請不要公開分享。</p>
+</section>
+<section class="panel" id="more" hidden><h2>還有想問的事？</h2><p class="msg">讀完之後如果有特別在意的事，可以<a href="account.html">登入會員</a>使用追問。</p></section>
+</main>
+<footer>
+<span class="seal" aria-hidden="true"><span>夜燈</span><span>命書</span></span>
+<div>
+<nav aria-label="網站資訊"><a href="/">命書與價格</a><a href="faq.html">常見問題</a><a href="terms.html">服務條款</a><a href="privacy.html">隱私權政策</a><a href="refund.html">退款政策</a></nav>
+<p>夜燈命書　客服信箱：<span class="mail">service@yedeng.tw</span></p>
+<p>命盤依紫微斗數傳統規則計算，解讀僅供參考與娛樂。</p>
+</div>
+</footer>
+<script src="yd.js"></script>
+<script>
+
+(function(){
+  var $=YD.$, tok=decodeURIComponent((location.hash||"").slice(1));
+  if(!tok){$("#lead").textContent="連結不完整，請從信裡的按鈕重新打開。";return;}
+  function load(){
+    YD.api("/reports/"+encodeURIComponent(tok)).then(function(r){
+      if(r.status==="preparing"){$("#lead").innerHTML='<span class="spin"></span> 命書還在產生，完成後這頁會自動更新。';setTimeout(load,8000);return;}
+      $("#title").textContent="你的"+r.title; document.title=r.title+"｜夜燈命書";
+      $("#lead").textContent=(r["for"]?r["for"]+"的"+r.title+"，":"")+"完成於 "+YD.fmtDate(r.generated_at)+"。";
+      $("#b-open").href=r.pdf_url; $("#b-dl").href=r.download_url||r.pdf_url; $("#ready").hidden=false; $("#more").hidden=r.kind==="gua";
+    }).catch(function(e){$("#lead").textContent=e.status===404?"這個連結不存在或已經失效。需要協助請寫信到 service@yedeng.tw。":e.message;});
+  }
+  load();
+})();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="夜燈命書訂單狀態：繳費資訊與命書產生進度。">
+<meta name="theme-color" content="#05070d">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<title>訂單狀態｜夜燈命書</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700;900&family=Noto+Sans+TC:wght@400;500;700&family=LXGW+WenKai+TC:wght@700&display=swap">
+<link rel="stylesheet" href="legal.css">
+<link rel="stylesheet" href="app.css">
+</head>
+<body class="app">
+<header class="top"><a class="brand" href="/">夜燈命書</a>
+<nav class="nav" aria-label="主選單"><a href="/">命書與價格</a><a href="faq.html">常見問題</a><a href="account.html">會員</a></nav></header>
+<main class="doc">
+
+<div class="doc-head"><h1>謝謝你點燈</h1><p class="lead" id="lead">正在確認訂單…</p></div>
+<ol class="steps-mini" id="steps" aria-label="進度"><li>下單</li><li>付款</li><li>產生命書</li><li>可以閱讀</li></ol>
+<section class="panel" id="pay" hidden><h2>繳費資訊</h2><dl class="kv2" id="pay-kv"></dl>
+<p class="msg">繳費資訊也寄到你的信箱了。繳費完成後，命書會自動開始產生。</p></section>
+<section class="panel" id="books" hidden><h2>你的命書</h2><ul class="list" id="l-books"></ul></section>
+<section class="panel" id="nolink" hidden><p class="msg">這個頁面查不到訂單資訊，可能是換了瀏覽器或裝置。付款結果和閱讀連結都會寄到你的 Email；也可以<a href="login.html">登入會員</a>查看。</p></section>
+</main>
+<footer>
+<span class="seal" aria-hidden="true"><span>夜燈</span><span>命書</span></span>
+<div>
+<nav aria-label="網站資訊"><a href="/">命書與價格</a><a href="faq.html">常見問題</a><a href="terms.html">服務條款</a><a href="privacy.html">隱私權政策</a><a href="refund.html">退款政策</a></nav>
+<p>夜燈命書　客服信箱：<span class="mail">service@yedeng.tw</span></p>
+<p>命盤依紫微斗數傳統規則計算，解讀僅供參考與娛樂。</p>
+</div>
+</footer>
+<script src="yd.js"></script>
+<script>
+
+(function(){
+  var $=YD.$, esc=YD.esc, t=new URLSearchParams(location.search).get("t")||"", tok=null;
+  try{tok=localStorage.getItem("yd_order_"+t);}catch(e){}
+  if(!t||!tok){$("#lead").textContent="付款結果會寄到你的 Email。";$("#nolink").hidden=false;$("#steps").hidden=true;return;}
+  var KIND={ziwei_base:"紫微命書",ziwei_year:"流年書",ziwei_pair:"合盤書",gua:"周易解卦"}, timer=null;
+  function step(n){[].forEach.call($("#steps").children,function(li,i){li.className=i<n?"done":i===n?"now":"";});}
+  function tick(){
+    YD.api("/orders/"+encodeURIComponent(t)+"/status?token="+encodeURIComponent(tok)).then(function(o){
+      var pi=o.payment_info||{};
+      if(o.status==="pending"){step(1);$("#lead").textContent="還沒收到付款結果。如果你剛付完款，請稍等一下。";}
+      else if(o.status==="awaiting_payment"){step(1);$("#lead").textContent="請在期限內完成繳費，金額 NT$"+o.amount.toLocaleString()+"。";$("#pay").hidden=false;
+        $("#pay-kv").innerHTML=(pi.vAccount?'<dt>銀行代碼</dt><dd class="big-code">'+esc(pi.BankCode)+'</dd><dt>轉帳帳號</dt><dd class="big-code">'+esc(pi.vAccount)+'</dd>':'<dt>超商代碼</dt><dd class="big-code">'+esc(pi.PaymentNo)+'</dd>')+'<dt>繳費期限</dt><dd>'+esc(pi.ExpireDate)+'</dd><dt>金額</dt><dd>NT$'+o.amount.toLocaleString()+'</dd>';}
+      else if(o.status==="paid"){$("#pay").hidden=true;var ready=o.reports.length&&o.reports.every(function(r){return r.token;});
+        step(ready?4:2);$("#lead").textContent=ready?"燈已經點上了，可以開始閱讀。":"付款完成，命書正在產生，通常幾分鐘內完成，完成後也會寄信通知你。";
+        $("#books").hidden=!o.reports.length;
+        $("#l-books").innerHTML=o.reports.map(function(r){return '<li><div class="t">'+(KIND[r.kind]||"命書")+'</div>'+(r.token?'<a class="btn primary small" href="r.html#'+encodeURIComponent(r.token)+'">閱讀</a>':'<span class="chip wait"><span class="spin"></span> 產生中</span>')+'</li>';}).join("");
+        if(ready){clearInterval(timer);return;}}
+      else{step(0);$("#lead").textContent=o.status==="expired"?"這筆訂單已經超過繳費期限，不會扣款。需要的話請重新下單。":"這筆訂單沒有完成付款。需要協助請寫信到 service@yedeng.tw。";clearInterval(timer);}
+    }).catch(function(e){$("#lead").textContent=e.message;});
+  }
+  tick(); timer=setInterval(tick,6000);
+})();
+
+</script>
+</body>
+</html>
