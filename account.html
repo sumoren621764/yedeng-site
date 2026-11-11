@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="夜燈命書會員中心：我的命書、追問、常用生辰與帳號設定。">
+<meta name="theme-color" content="#05070d">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<title>我的命書｜夜燈命書</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700;900&family=Noto+Sans+TC:wght@400;500;700&family=LXGW+WenKai+TC:wght@700&display=swap">
+<link rel="stylesheet" href="legal.css">
+<link rel="stylesheet" href="app.css">
+</head>
+<body class="app">
+<header class="top"><a class="brand" href="/">夜燈命書</a>
+<nav class="nav" aria-label="主選單"><a href="/">命書與價格</a><a href="faq.html">常見問題</a><a href="account.html" aria-current="page">會員</a></nav></header>
+<main class="doc">
+
+<div class="doc-head"><h1>我的命書</h1><p class="lead" id="hello">載入中…</p></div>
+<div class="tabs" role="tablist" aria-label="會員功能">
+<button role="tab" aria-selected="true" data-tab="books">命書</button><button role="tab" aria-selected="false" data-tab="ask">追問</button><button role="tab" aria-selected="false" data-tab="people">常用生辰</button><button role="tab" aria-selected="false" data-tab="acct">帳號</button>
+</div>
+
+<section class="panel" data-pane="books"><h2>買過的命書</h2><ul class="list" id="l-books"><li class="empty">載入中…</li></ul>
+<p class="msg">想再點一盞燈？回到<a href="/">命書與價格</a>。</p></section>
+
+<section class="panel" data-pane="ask" hidden><h2>追問夜燈</h2>
+<p class="msg" id="credit-sum">載入中…</p>
+<form id="f-ask" hidden novalidate>
+<div class="field"><label for="ask-credit">使用哪一份額度</label><select id="ask-credit"></select></div>
+<div class="field"><label for="ask-cat">類別</label><select id="ask-cat"><option value="love">感情</option><option value="work">工作</option><option value="exam">考試・學業</option><option value="money">錢與財務</option><option value="partner">合夥・合作</option><option value="move">搬家・搬遷</option><option value="people">家人・人際</option><option value="other">其他</option></select></div>
+<div class="field"><label for="ask-q">你的問題</label><textarea id="ask-q" maxlength="200" placeholder="一題只問一件事，例如「我適合在今年換工作嗎？」"></textarea><span class="hint">不回答醫療、壽命、投資標的、彩券號碼與官司輸贏。</span></div>
+<button class="btn primary" type="submit">送出問題</button>
+</form>
+<h2 style="margin-top:24px">我的提問</h2><ul class="list" id="l-qs"><li class="empty">載入中…</li></ul></section>
+
+<section class="panel" data-pane="people" hidden><h2>常用生辰</h2>
+<ul class="list" id="l-people"><li class="empty">載入中…</li></ul>
+<details style="margin-top:16px"><summary class="btn ghost small">新增一筆</summary>
+<form id="f-person" style="margin-top:14px" novalidate>
+<div class="row2"><div class="field"><label for="p-name">稱呼</label><input id="p-name" maxlength="20" required></div>
+<div class="field"><label for="p-label">關係</label><select id="p-label"><option value="self">自己</option><option value="partner">伴侶</option><option value="family">家人</option><option value="friend">朋友</option><option value="other">其他</option></select></div></div>
+<div class="row2"><div class="field"><label for="p-sex">性別</label><select id="p-sex"><option value="female">女</option><option value="male">男</option></select></div>
+<div class="field"><label for="p-date">國曆生日</label><input id="p-date" type="date" required min="1900-01-01"></div></div>
+<div class="field"><label for="p-hour">出生時辰</label><select id="p-hour"></select></div>
+<button class="btn primary" type="submit">儲存</button>
+</form></details>
+<p class="msg">已經用在訂單上的生辰無法真正刪除（訂單需要留存），刪除後只會從清單隱藏。</p></section>
+
+<section class="panel" data-pane="acct" hidden><h2>帳號</h2>
+<dl class="kv2" id="acct-kv"></dl>
+<div id="bind" hidden style="margin-top:18px"><p class="msg">你是用 LINE 登入，還沒有綁定 Email。綁定後，用這個 Email 買過的命書會一起出現在這裡。</p>
+<a class="btn ghost" href="login.html?mode=bind&amp;next=/account.html" id="b-bind">綁定 Email</a></div>
+<label class="field" style="flex-direction:row;align-items:center;gap:10px;margin-top:18px"><input type="checkbox" id="news" style="width:auto"> 願意收到夜燈命書的節氣提醒</label>
+<div class="stack" style="margin-top:18px"><button class="btn ghost" id="b-logout">登出</button><button class="btn danger" id="b-delete">申請刪除帳號</button></div>
+</section>
+</main>
+<footer>
+<span class="seal" aria-hidden="true"><span>夜燈</span><span>命書</span></span>
+<div>
+<nav aria-label="網站資訊"><a href="/">命書與價格</a><a href="faq.html">常見問題</a><a href="terms.html">服務條款</a><a href="privacy.html">隱私權政策</a><a href="refund.html">退款政策</a></nav>
+<p>夜燈命書　客服信箱：<span class="mail">service@yedeng.tw</span></p>
+<p>命盤依紫微斗數傳統規則計算，解讀僅供參考與娛樂。</p>
+</div>
+</footer>
+<script src="yd.js"></script>
+<script>
+
+(function(){
+  var $=YD.$, esc=YD.esc;
+  var HOURS=["早子時 00–01","丑時 01–03","寅時 03–05","卯時 05–07","辰時 07–09","巳時 09–11","午時 11–13","未時 13–15","申時 15–17","酉時 17–19","戌時 19–21","亥時 21–23","晚子時 23–24"];
+  var KIND={ask:"追問",gift:"附贈一題",gua_extra:"加問卦"}, LABEL={self:"自己",partner:"伴侶",family:"家人",friend:"朋友",other:"其他"};
+  var ST={queued:["排隊中","wait"],generating:["產生中","wait"],qa_retry:["產生中","wait"],needs_review:["人工檢查中","wait"],ready:["可以閱讀","ok"],sent:["可以閱讀","ok"],failed:["產生失敗","bad"]};
+  $("#p-hour").innerHTML=HOURS.map(function(h,i){return '<option value="'+i+'">'+h+'</option>';}).join("");
+  $("#p-date").max=new Date().toISOString().slice(0,10);
+  document.querySelectorAll("[role=tab]").forEach(function(t){t.addEventListener("click",function(){
+    document.querySelectorAll("[role=tab]").forEach(function(x){x.setAttribute("aria-selected",x===t);});
+    document.querySelectorAll("[data-pane]").forEach(function(p){p.hidden=p.dataset.pane!==t.dataset.tab;});
+  });});
+  function fail(e){ if(e.status===401) location.replace("login.html?next="+encodeURIComponent(location.pathname+location.hash)); else YD.toast(e.message,true); }
+
+  YD.api("/me").then(function(me){
+
+    $("#hello").textContent=(me.display_name||"你好")+"，燈還亮著。";
+    $("#acct-kv").innerHTML="<dt>Email</dt><dd>"+(me.email?esc(me.email):"尚未綁定")+"</dd><dt>登入方式</dt><dd>"+esc(me.providers.map(function(p){return {line:"LINE",google:"Google",supabase_auth:"Email",email:"Email"}[p]||p;}).filter(function(v,i,a){return a.indexOf(v)===i;}).join("、"))+"</dd>";
+    $("#bind").hidden=!me.needs_email; $("#news").checked=!!me.newsletter;
+    loadBooks(); loadAsk(); loadPeople();
+  }).catch(fail);
+
+  function loadBooks(){ YD.api("/me/reports").then(function(rs){
+    $("#l-books").innerHTML=rs.length?rs.map(function(r){var s=ST[r.status]||[r.status,""];
+      return '<li><div><div class="t">'+esc(r.title)+(r["for"]?"｜"+esc(r["for"]):"")+'</div><div class="s">'+YD.fmtDate(r.created_at)+'</div></div>'+
+        (r.token?'<a class="btn primary small" href="r.html#'+encodeURIComponent(r.token)+'">閱讀</a>':'<span class="chip '+s[1]+'">'+s[0]+'</span>')+'</li>';}).join(""):'<li class="empty">還沒有命書。</li>';
+  }).catch(fail);}
+
+  function loadAsk(){
+    YD.api("/me/credits").then(function(cs){
+      var ask=cs.filter(function(c){return c.kind==="ask";});
+      var n=ask.reduce(function(a,c){return a+c.remaining;},0);
+      $("#credit-sum").innerHTML=n?"你還有 <b>"+n+"</b> 題可以問。":"目前沒有追問額度。讀完命書後，可以在命書頁面加購追問。";
+      $("#f-ask").hidden=!n;
+      $("#ask-credit").innerHTML=ask.map(function(c){return '<option value="'+c.id+'">剩 '+c.remaining+' 題'+(c.expires_at?"（"+YD.fmtDate(c.expires_at)+" 到期）":"")+'</option>';}).join("");
+    }).catch(fail);
+    YD.api("/me/questions").then(function(qs){
+      $("#l-qs").innerHTML=qs.length?qs.map(function(q){var s=q.status==="answered"?["已回答","ok"]:q.status==="rejected"?["無法回答","bad"]:["回答中","wait"];
+        return '<li style="display:block"><div style="display:flex;justify-content:space-between;gap:10px"><div class="t">'+esc(q.question)+'</div><span class="chip '+s[1]+'">'+s[0]+'</span></div>'+
+          (q.answer?'<p style="white-space:pre-wrap;margin:10px 0 0">'+esc(q.answer)+'</p>':'')+'<div class="s">'+YD.fmtDate(q.asked_at)+'</div></li>';}).join(""):'<li class="empty">還沒有提問。</li>';
+    }).catch(fail);
+  }
+  $("#f-ask").addEventListener("submit",function(ev){ev.preventDefault();
+    var q=$("#ask-q").value.trim(); if(q.length<4){YD.toast("問題至少 4 個字",true);return;}
+    var b=this.querySelector("button"); YD.busy(b,true,"送出中…");
+    YD.api("/me/questions",{method:"POST",body:{credit_id:$("#ask-credit").value,category:$("#ask-cat").value,question:q}})
+    .then(function(){$("#ask-q").value="";YD.toast("已送出，回答好會寄信通知你");loadAsk();}).catch(fail).then(function(){YD.busy(b,false);});
+  });
+
+  function loadPeople(){ YD.api("/me/profiles").then(function(ps){
+    $("#l-people").innerHTML=ps.length?ps.map(function(p){
+      return '<li><div><div class="t">'+esc(p.nickname)+' <span class="chip">'+(LABEL[p.label]||esc(p.label))+'</span></div><div class="s">'+p.birth_year+'/'+p.birth_month+'/'+p.birth_day+'　'+(p.hour_index!=null?HOURS[p.hour_index]:esc(p.birth_hour)+'時')+'　'+(p.gender==="male"?"男":"女")+'</div></div>'+
+        '<button class="btn ghost small" data-del="'+p.id+'">刪除</button></li>';}).join(""):'<li class="empty">還沒有保存的生辰。</li>';
+  }).catch(fail);}
+  $("#l-people").addEventListener("click",function(e){var id=e.target.dataset&&e.target.dataset.del; if(!id||!confirm("確定要刪除這筆生辰嗎？"))return;
+    YD.api("/me/profiles/"+id,{method:"DELETE"}).then(loadPeople).catch(fail);});
+  $("#f-person").addEventListener("submit",function(ev){ev.preventDefault();
+    var name=$("#p-name").value.trim(), d=$("#p-date").value; if(!name||!d){YD.toast("請填寫稱呼和生日",true);return;}
+    var b=this.querySelector("button"); YD.busy(b,true);
+    YD.api("/me/profiles",{method:"POST",body:{label:$("#p-label").value,nickname:name,gender:$("#p-sex").value,solar:d,hour_index:+$("#p-hour").value}})
+    .then(function(){ev.target.reset();ev.target.closest("details").open=false;YD.toast("已儲存");loadPeople();}).catch(fail).then(function(){YD.busy(b,false);});
+  });
+
+  $("#news").addEventListener("change",function(){YD.api("/me",{method:"PATCH",body:{newsletter:this.checked}}).then(function(){YD.toast("已更新");}).catch(fail);});
+  $("#b-logout").addEventListener("click",function(){YD.api("/auth/logout",{method:"POST"}).then(function(){location.href="/";}).catch(fail);});
+  $("#b-delete").addEventListener("click",function(){
+    if(!confirm("確定要申請刪除帳號嗎？我們會在 15 日內處理並寄信通知你。依法需保留的訂單紀錄除外。"))return;
+    YD.api("/me/delete-request",{method:"POST"}).then(function(r){YD.toast(r.message);}).catch(fail);
+  });
+})();
+
+</script>
+</body>
+</html>
