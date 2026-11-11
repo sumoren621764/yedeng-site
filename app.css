@@ -56,3 +56,20 @@ input,textarea,select{-webkit-user-select:text;user-select:text}
 .otp{letter-spacing:.5em;text-align:center;font-size:1.4rem!important}
 @media (max-width:560px){.row2{grid-template-columns:1fr}.list li{flex-wrap:wrap}}
 @media (prefers-reduced-motion:reduce){.spin{animation:none}}
+/* 場景圖、圖示、複製鈕 */
+.scene{margin:8px 0 -36px;position:relative;border-radius:4px;overflow:hidden;aspect-ratio:16/9;max-height:320px;width:100%;box-shadow:0 20px 50px -24px rgba(0,0,0,.9)}
+.scene img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 30%}
+.scene::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,7,13,0) 45%,rgba(5,7,13,.85) 88%,var(--night));pointer-events:none}
+.scene+.doc-head{position:relative;padding-top:0}
+.scene+.doc-head h1{text-shadow:0 2px 18px rgba(0,0,0,.8),0 0 24px rgba(242,207,142,.35)}
+.btn .ic{width:20px;height:20px;flex:none}
+.btn.line .ic{width:22px;height:22px}
+.panel h2{display:flex;align-items:center;gap:10px}
+.panel h2::before{content:"";width:8px;height:8px;flex:none;transform:rotate(45deg);background:var(--lamp);box-shadow:0 0 10px rgba(242,207,142,.8)}
+.copy{font:inherit;font-size:.78rem;color:var(--gold);background:rgba(242,207,142,.08);border:1px solid rgba(216,180,106,.4);border-radius:99px;padding:2px 12px;cursor:pointer;vertical-align:middle;margin-left:6px;white-space:nowrap}
+.copy:hover{background:rgba(242,207,142,.16)}
+.steps-mini li{position:relative;padding-top:14px}
+.steps-mini li.done::before{content:"✓";position:absolute;top:-12px;left:50%;transform:translateX(-50%);width:20px;height:20px;line-height:20px;border-radius:50%;background:var(--lamp);color:#1a1206;font-size:.7rem;font-weight:700}
+.steps-mini li.now::before{content:"";position:absolute;top:-9px;left:50%;transform:translateX(-50%);width:14px;height:14px;border-radius:50%;background:var(--night);border:2px solid var(--gold);box-shadow:0 0 10px rgba(216,180,106,.7)}
+.steps-mini{margin-top:18px}
+@media (min-width:700px){.scene{margin-bottom:-56px}}
