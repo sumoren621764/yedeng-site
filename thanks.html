@@ -22,6 +22,7 @@
 <nav class="nav" aria-label="主選單"><a href="/">命書與價格</a><a href="faq.html">常見問題</a><a href="account.html">會員</a></nav></header>
 <main class="doc">
 
+<figure class="scene"><img src="img/book.webp" alt="在燈下翻閱命書的引路人" width="1280" height="850" decoding="async" fetchpriority="high"></figure>
 <div class="doc-head"><h1>謝謝你點燈</h1><p class="lead" id="lead">正在確認訂單…</p></div>
 <ol class="steps-mini" id="steps" aria-label="進度"><li>下單</li><li>付款</li><li>產生命書</li><li>可以閱讀</li></ol>
 <section class="panel" id="pay" hidden><h2>繳費資訊</h2><dl class="kv2" id="pay-kv"></dl>
@@ -51,7 +52,7 @@
       var pi=o.payment_info||{};
       if(o.status==="pending"){step(1);$("#lead").textContent="還沒收到付款結果。如果你剛付完款，請稍等一下。";}
       else if(o.status==="awaiting_payment"){step(1);$("#lead").textContent="請在期限內完成繳費，金額 NT$"+o.amount.toLocaleString()+"。";$("#pay").hidden=false;
-        $("#pay-kv").innerHTML=(pi.vAccount?'<dt>銀行代碼</dt><dd class="big-code">'+esc(pi.BankCode)+'</dd><dt>轉帳帳號</dt><dd class="big-code">'+esc(pi.vAccount)+'</dd>':'<dt>超商代碼</dt><dd class="big-code">'+esc(pi.PaymentNo)+'</dd>')+'<dt>繳費期限</dt><dd>'+esc(pi.ExpireDate)+'</dd><dt>金額</dt><dd>NT$'+o.amount.toLocaleString()+'</dd>';}
+        $("#pay-kv").innerHTML=(pi.vAccount?'<dt>銀行代碼</dt><dd><span class="big-code">'+esc(pi.BankCode)+'</span></dd><dt>轉帳帳號</dt><dd><span class="big-code">'+esc(pi.vAccount)+'</span> <button class="copy" type="button" data-c="'+esc(pi.vAccount)+'">複製</button></dd>':'<dt>超商代碼</dt><dd><span class="big-code">'+esc(pi.PaymentNo)+'</span> <button class="copy" type="button" data-c="'+esc(pi.PaymentNo)+'">複製</button></dd>')+'<dt>繳費期限</dt><dd>'+esc(pi.ExpireDate)+'</dd><dt>金額</dt><dd>NT$'+o.amount.toLocaleString()+'</dd>';}
       else if(o.status==="paid"){$("#pay").hidden=true;var ready=o.reports.length&&o.reports.every(function(r){return r.token;});
         step(ready?4:2);$("#lead").textContent=ready?"燈已經點上了，可以開始閱讀。":"付款完成，命書正在產生，通常幾分鐘內完成，完成後也會寄信通知你。";
         $("#books").hidden=!o.reports.length;
@@ -60,6 +61,8 @@
       else{step(0);$("#lead").textContent=o.status==="expired"?"這筆訂單已經超過繳費期限，不會扣款。需要的話請重新下單。":"這筆訂單沒有完成付款。需要協助請寫信到 service@yedeng.tw。";clearInterval(timer);}
     }).catch(function(e){$("#lead").textContent=e.message;});
   }
+  $("#pay-kv").addEventListener("click",function(e){var b=e.target.closest(".copy");if(!b)return;
+    (navigator.clipboard?navigator.clipboard.writeText(b.dataset.c):Promise.reject()).then(function(){YD.toast("已複製");},function(){YD.toast("請長按號碼複製",true);});});
   tick(); timer=setInterval(tick,6000);
 })();
 
