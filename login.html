@@ -31,8 +31,8 @@
 <button class="btn primary" type="submit"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 6.5 8.5 6.5 8.5-6.5"/></svg>寄登入信給我</button>
 </form>
 <form id="f-otp" class="stack" hidden novalidate>
-<p class="msg">信已經寄到 <b id="sent-to"></b>。點信裡的連結就能登入；如果信裡有 6 位數驗證碼，也可以直接輸入。</p>
-<div class="field"><label for="otp">驗證碼</label><input id="otp" class="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}"></div>
+<p class="msg">信已經寄到 <b id="sent-to"></b>。點信裡的連結就能登入；也可以直接輸入信裡的驗證碼。</p>
+<div class="field"><label for="otp">驗證碼</label><input id="otp" class="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="10" pattern="[0-9]{6,10}"></div>
 <button class="btn primary" type="submit">登入</button>
 <button class="btn ghost" type="button" id="resend">重新輸入 Email</button>
 </form>
@@ -79,7 +79,7 @@
   });
   $("#f-otp").addEventListener("submit",function(ev){
     ev.preventDefault(); var code=$("#otp").value.replace(/\D/g,"");
-    if(code.length!==6){m.className="msg bad";m.textContent="請輸入 6 位數驗證碼";return;}
+    if(code.length<6||code.length>10){m.className="msg bad";m.textContent="請輸入信裡的數字驗證碼";return;}
     var b=ev.submitter||this.querySelector("button[type=submit]"); YD.busy(b,true,"登入中…");
     YD.sb().then(function(c){return c.auth.verifyOtp({email:email,token:code,type:"email"});})
     .then(function(r){if(r.error) throw r.error; return YD.exchange(ex);})
