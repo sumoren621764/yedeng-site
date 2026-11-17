@@ -24,3 +24,5 @@ html::after{box-shadow:24vw 14vh 5px 0px rgba(255,232,180,0.65),19vw 21vh 4px 1p
 
 /* 明確設定底色，避免嵌入預覽時被套上亮色背景 */
 html{background:var(--night)!important}body{background:transparent!important;color:var(--paper)}
+
+footer .social{display:flex;gap:14px;margin:4px 0 8px}footer .social a{display:inline-flex;width:30px;height:30px;align-items:center;justify-content:center;border:1px solid var(--rule);border-radius:50%;color:var(--mute);transition:color .2s,border-color .2s}footer .social a:hover{color:var(--lamp);border-color:var(--gold)}footer .social svg{width:15px;height:15px;fill:currentColor}
