@@ -79,3 +79,6 @@ html{scroll-behavior:smooth}
   .kv{grid-template-columns:5em 1fr;column-gap:12px;font-size:.88rem}
 }
 @media (prefers-reduced-motion:reduce){.soon .dot{animation:none}html{scroll-behavior:auto}}
+
+.cta-row{margin:22px 0 0}.cta{display:inline-block;font-family:var(--serif);font-weight:900;letter-spacing:.22em;color:#1a1206;background:linear-gradient(180deg,#f6dc9c,#d8b46a);padding:13px 26px 13px 30px;border-radius:3px;text-decoration:none;box-shadow:0 10px 30px -10px rgba(242,207,142,.7)}.cta:hover{filter:brightness(1.07);color:#1a1206}
+.book .go{grid-column:1/-1;justify-self:end;font-size:.88rem;color:var(--gold);text-decoration:none;border-bottom:1px solid rgba(216,180,106,.4);padding-bottom:2px}.book .go:hover{color:var(--lamp)}
