@@ -1,0 +1,968 @@
+<!doctype html><html lang="zh-Hant-TW"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="description" content="夜燈命書：和引路人一起排一張紫微命盤，或為心裡的一件事擲一卦。免費排盤，想看完整解讀再點一盞燈。"><meta name="theme-color" content="#05070d"><link rel="icon" href="/favicon.ico" sizes="32x32"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest"><style>body{margin:0;padding:0;background:#05070d}img{max-width:100%}</style></head><body>
+<title>夜燈命書｜紫微斗數・周易問卦</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<style>
+/* Layout: one full-screen scene. Video of the guide behind, gold star chart floating in the upper half, visual-novel dialogue box at the bottom. Committed night look. */
+:root{
+  --night:#05070d;
+  --ink2:#0d1220;
+  --line:rgba(216,180,106,.28);
+  --gold:#d8b46a;
+  --gold-dim:#8c7646;
+  --cinnabar:#e0573f;
+  --jade:#5fb39a;
+  --fg:#e9e4d6;
+  --mute:#9a9fae;
+  --serif:"Noto Serif TC","Songti TC","PMingLiU",serif;
+  --sans:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  color-scheme:dark;
+}
+html,body{height:100%;background:var(--night);color:var(--fg);overflow:hidden}
+body{font-family:var(--sans)}
+/* 不讓命盤、動畫被反白或長按選取；輸入框照常可選 */
+body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+input,textarea{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
+img,svg,video,canvas{-webkit-user-drag:none}
+::selection{background:rgba(216,180,106,.28);color:inherit}
+[hidden]{display:none!important}
+
+.rt{position:fixed;inset:0;overflow:hidden;background:var(--night)}
+.rt::before{content:"";position:absolute;inset:-40px;background:url(v/shot-wide.jpg) center/cover;filter:blur(36px) brightness(.32) saturate(1.1)}
+.rt-bg{position:absolute;inset:0;transform-origin:50% 30%;opacity:0;transform:scale(var(--z,1.12)) translate(var(--tx,0),var(--ty,2%));transition:transform 3.2s cubic-bezier(.3,.1,.2,1),opacity 2.4s ease,filter 2s ease;filter:brightness(.35) saturate(.7)}
+.rt.lit .rt-bg{opacity:1;filter:brightness(.95) saturate(1)}
+.rt.lit.dim .rt-bg{filter:brightness(.5) saturate(.9)}
+@media (min-aspect-ratio:3/4){.rt-bg{left:0;right:0;margin-inline:auto;width:min(100%,calc(100dvh*9/16));width:min(100%,round(calc(100dvh*9/16),2px));overflow:hidden;clip-path:inset(1px 1px);backface-visibility:hidden}.rt-bg::after{content:"";position:absolute;inset:-2px;z-index:1;pointer-events:none;box-shadow:inset 72px 0 60px -28px var(--night),inset -72px 0 60px -28px var(--night)}}
+.clip{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 18%;opacity:0;transition:opacity 1.3s ease}
+.clip.on{opacity:1}
+.rt-glow{position:absolute;inset:0;pointer-events:none;background:radial-gradient(60% 40% at 50% 100%,rgba(224,87,63,.26),transparent 70%);animation:flicker 4s ease-in-out infinite;opacity:0;transition:opacity 2s}
+.rt.lit .rt-glow{opacity:1}
+@keyframes flicker{0%,100%{filter:brightness(1)}45%{filter:brightness(1.35)}55%{filter:brightness(.85)}}
+.rt-fx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:2}
+.rt-veil{position:absolute;inset:0;pointer-events:none;background:linear-gradient(to bottom,rgba(5,7,13,.5),transparent 20%,transparent 46%,rgba(5,7,13,.92) 82%)}
+
+/* opening */
+.rt-intro{position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:18px;text-align:center;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 12vh);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));transition:opacity .9s,transform .9s}
+.rt-intro.out{opacity:0;transform:translateY(14px);pointer-events:none}
+.rt-kicker{margin:0;font-size:.72rem;letter-spacing:.5em;color:var(--cinnabar);animation:in 1.6s .4s both}
+.rt-title{margin:0;font-family:var(--serif);font-weight:900;font-size:clamp(2rem,9vw,3.2rem);line-height:1.3;letter-spacing:.18em;text-shadow:0 2px 24px rgba(0,0,0,.8);animation:in 2s .9s both;text-wrap:balance}
+.rt-enter{all:unset;cursor:pointer;font-family:var(--serif);font-weight:700;letter-spacing:.4em;padding:14px 34px 14px 40px;border:1px solid var(--gold);color:var(--gold);border-radius:2px;background:rgba(5,7,13,.45);animation:in 1.6s 1.8s both,pulse 2.6s 3.4s ease-in-out infinite}
+.rt-enter:hover,.rt-enter:focus-visible{background:var(--gold);color:var(--night)}
+@keyframes in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes pulse{50%{box-shadow:0 0 0 8px rgba(216,180,106,.12),0 0 30px rgba(216,180,106,.25)}}
+
+/* floating star chart */
+.chart{position:absolute;z-index:3;left:0;right:0;margin-inline:auto;top:46%;width:min(calc(100% - 32px),420px,44dvh);opacity:0;transform:translateY(-50%) scale(.35) translateY(60px);transition:opacity 1.2s ease,transform 1.6s cubic-bezier(.2,.8,.2,1);pointer-events:none;filter:drop-shadow(0 0 10px rgba(216,180,106,.35))}
+.chart.on{opacity:1;transform:translateY(-50%)}
+.chart.away{opacity:0;transform:translateY(-50%) scale(1.1) translateY(-30px);transition:opacity 1.4s ease,transform 1.8s ease}
+.chart svg{display:block;width:100%;height:auto}
+/* 試閱：命盤留在上半部，邊講邊亮對應的宮位 */
+.chart.read{top:calc(env(safe-area-inset-top,0px) + 4dvh + min(calc(100vw - 32px),360px,36dvh) / 2);width:min(calc(100% - 32px),360px,36dvh)}
+.chart .fade.on.muted{opacity:.32;transition:opacity .6s ease}
+.chart.read .frm{opacity:0}
+.chart .focus rect{fill:rgba(216,180,106,.1);stroke-width:2.5;animation:glow 2.4s ease-in-out infinite}
+.chart .focus text{font-size:11px;font-weight:700;letter-spacing:.08em}
+@keyframes glow{50%{fill:rgba(216,180,106,.22);filter:drop-shadow(0 0 6px rgba(216,180,106,.7))}}
+.rt.reading .rt-line{max-height:min(34dvh,42dvh)}
+@media (min-aspect-ratio:3/4){.chart.read{top:calc(env(safe-area-inset-top,0px) + 3dvh + min(calc(100dvh*9/16 - 32px),480px,46dvh) / 2);width:min(calc(100dvh*9/16 - 32px),480px,46dvh)}.rt.reading .rt-line{max-height:26dvh}}
+.cell{fill:rgba(8,11,20,.62);stroke:rgba(216,180,106,.35);stroke-width:1}
+.cell.ming{stroke:var(--gold);stroke-width:2;fill:rgba(216,180,106,.1)}
+.branch{font-family:var(--serif);font-size:13px;fill:rgba(233,228,214,.55)}
+.pname{font-family:var(--sans);font-size:11px;fill:var(--gold);font-weight:700}
+.star{font-family:var(--serif);font-size:15px;fill:#fff6e2;font-weight:700}
+.hua{font-size:10px;font-weight:700}
+.center-t{font-family:var(--serif);fill:var(--fg);text-anchor:middle}
+.fade{opacity:0;transition:opacity .45s ease}
+.fade.on{opacity:1}
+.pop{opacity:0;transform-box:fill-box;transform-origin:center;transform:translateY(-6px);transition:opacity .35s ease,transform .35s ease}
+.pop.on{opacity:1;transform:none}
+.link{fill:none;stroke-width:2;stroke-dasharray:400;stroke-dashoffset:400;transition:stroke-dashoffset 1s ease}
+.link.on{stroke-dashoffset:0}
+
+/* fortune slips */
+.slips{position:absolute;z-index:3;left:0;right:0;top:calc(env(safe-area-inset-top,0px) + 6vh);display:flex;flex-direction:column;align-items:center;gap:10px;pointer-events:none;padding-inline:16px}
+.slip{font-family:var(--serif);font-size:.95rem;letter-spacing:.08em;padding:8px 16px;border:1px solid rgba(216,180,106,.5);background:rgba(5,7,13,.62);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);animation:float-in 1s both}
+.slip b{filter:blur(4px);user-select:none;color:var(--gold)}
+@keyframes float-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+/* dialogue */
+.rt-box{position:absolute;z-index:4;left:0;right:0;bottom:0;display:flex;flex-direction:column;gap:8px;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 16px);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.rt-box>*{width:100%;max-width:520px;margin-inline:auto;box-sizing:border-box}
+.rt-echo{margin:0;text-align:right;font-size:.8rem;min-height:1.2em}
+.rt-echo b{color:var(--fg);font-weight:500;background:rgba(42,53,80,.7);padding:3px 10px;border-radius:10px 10px 2px 10px}
+.rt-panel{position:relative;border:1px solid rgba(216,180,106,.35);border-radius:4px;background:linear-gradient(to bottom,rgba(13,18,32,.78),rgba(13,18,32,.93));backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);padding:26px 16px 16px;animation:in .8s both}
+.rt-panel::before,.rt-panel::after{content:"";position:absolute;width:10px;height:10px;border:1px solid var(--gold)}
+.rt-panel::before{top:-1px;left:-1px;border-right:0;border-bottom:0}
+.rt-panel::after{bottom:-1px;right:-1px;border-left:0;border-top:0}
+.rt-plate{position:absolute;top:-14px;left:14px;background:var(--cinnabar);color:#fff;font-family:var(--serif);font-weight:900;letter-spacing:.3em;font-size:.9rem;padding:4px 12px 4px 14px;display:flex;align-items:baseline;gap:8px}
+.rt-plate span{font-family:var(--sans);font-size:.62rem;font-weight:500;letter-spacing:.2em;opacity:.85}
+.rt-topic{margin:0 0 4px;font-family:var(--serif);font-size:.8rem;letter-spacing:.3em;color:var(--gold)}
+.rt-line{margin:0;font-family:var(--serif);font-size:1.06rem;line-height:1.85;min-height:3.7em;text-wrap:pretty;cursor:pointer;max-height:42dvh;overflow-y:auto}
+.rt-line.long{font-size:.98rem}
+.rt-line .veiled{filter:blur(5px);user-select:none;color:var(--mute);-webkit-mask-image:linear-gradient(to right,#000 40%,transparent);mask-image:linear-gradient(to right,#000 40%,transparent)}
+.rt-line .caret{display:inline-block;width:7px;height:7px;margin-left:6px;border-right:2px solid var(--gold);border-bottom:2px solid var(--gold);transform:rotate(45deg) translateY(-3px);animation:nudge 1s ease-in-out infinite}
+.rt-line .tap{display:inline-block;width:0;height:0;margin-left:8px;border-left:5px solid transparent;border-right:5px solid transparent;border-top:7px solid var(--gold);animation:bob 1.1s ease-in-out infinite}
+@keyframes nudge{50%{transform:rotate(45deg) translate(2px,-1px)}}
+@keyframes bob{50%{transform:translateY(3px)}}
+.rt-reply{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.rt-reply:empty{display:none}
+.rt-reply>*{animation:in .5s both}
+.chip{all:unset;cursor:pointer;border:1px solid rgba(216,180,106,.55);border-radius:2px;padding:9px 16px;font-size:.9rem;color:var(--fg);text-align:center;background:rgba(5,7,13,.35);flex:1 1 auto}
+.chip small{display:block;font-size:.64rem;color:var(--mute)}
+.chip:hover,.chip:focus-visible{background:var(--gold);color:var(--night);border-color:var(--gold)}
+.chip:hover small,.chip:focus-visible small{color:var(--night)}
+.chip.main{background:var(--gold);color:var(--night);font-family:var(--serif);font-weight:700;letter-spacing:.2em}
+.chip.big{flex-basis:100%;text-align:left;padding:12px 16px}
+.chip.big small{font-size:.72rem;margin-top:2px}
+.chip.lamp{flex-basis:100%;display:flex;justify-content:space-between;align-items:center;text-align:left;padding:13px 16px;font-family:var(--serif)}
+.chip.lamp em{font-style:normal;font-family:var(--sans);font-weight:700;letter-spacing:0}
+.chip.lamp small{font-family:var(--sans)}
+.chip.lamp.main em{color:var(--night)}
+.chip.lamp small{margin-top:3px}
+.chip.lamp.main small{color:rgba(5,7,13,.72)}
+.chip.add[aria-pressed="true"]{border-color:var(--jade);color:var(--jade)}
+.chip.add[aria-pressed="true"]::before{content:"✓ "}
+.chip.quiet{border-color:transparent;color:var(--mute);flex:0 1 auto;margin-left:auto}
+.hours{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;width:100%}
+.hours .chip{padding:7px 2px}
+.hours .wide{grid-column:span 4}
+.field{display:flex;gap:8px;width:100%}
+.field input{flex:1;min-width:0;background:rgba(5,7,13,.6);border:0;border-bottom:1px solid var(--gold-dim);color:var(--fg);padding:10px 4px;font:inherit;font-size:1.05rem;font-family:var(--serif);color-scheme:dark}
+.field input:focus{outline:none;border-bottom-color:var(--gold)}
+.field .chip{flex:none}
+.err{width:100%;color:#ff8a73;font-size:.78rem;margin:0}
+
+@media (prefers-reduced-motion:reduce){.chart .focus rect{animation:none}.rt-bg,.rt-intro,.chart{transition:opacity .3s}.rt-glow,.rt-enter,.rt-kicker,.rt-title,.rt-panel,.rt-reply>*,.slip{animation:none}.fade,.pop,.link{transition:none}}
+
+/* v12 additions */
+.dob{display:flex;flex-direction:column;gap:10px;width:100%}
+.cal{display:flex;gap:6px}
+.cal .chip{flex:0 0 auto;padding:6px 14px;font-size:.82rem}
+.cal .chip[aria-pressed="true"]{background:rgba(216,180,106,.18);border-color:var(--gold);color:var(--gold)}
+.sel{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:8px}
+.sel label{display:flex;flex-direction:column;gap:2px;font-size:.66rem;color:var(--mute);letter-spacing:.2em;min-width:0}
+.sel select{appearance:none;-webkit-appearance:none;background:rgba(5,7,13,.6);border:0;border-bottom:1px solid var(--gold-dim);color:var(--fg);padding:9px 4px;font-family:var(--serif);font-size:1.05rem;border-radius:0;min-width:0;color-scheme:dark}
+.sel select:focus{outline:none;border-bottom-color:var(--gold)}
+.dob .row{display:flex;gap:8px;align-items:center}
+.dob .row .err{flex:1}
+.dob .row .chip{flex:0 0 auto;margin-left:auto}
+.who{display:flex;flex-direction:column;gap:10px;width:100%}
+.who input{background:rgba(5,7,13,.6);border:0;border-bottom:1px solid var(--gold-dim);color:var(--fg);padding:10px 4px;font-family:var(--serif);font-size:1.05rem}
+.who input:focus{outline:none;border-bottom-color:var(--gold)}
+.who .pair{display:flex;gap:8px}
+.who .pair .chip{flex:1}
+.snd{all:unset;cursor:pointer;position:absolute;z-index:5;top:calc(env(safe-area-inset-top,0px) + 12px);right:max(12px,env(safe-area-inset-right,0px));width:34px;height:34px;display:grid;place-items:center;opacity:.4;transition:opacity .3s}
+.snd:hover,.snd:focus-visible{opacity:.9}
+.snd svg{width:18px;height:18px;stroke:var(--fg);fill:none;stroke-width:1.6}
+.snd[aria-pressed="false"] .on,.snd[aria-pressed="true"] .off{display:none}
+/* v13: 命書付費頁 */
+.pin{all:unset;cursor:pointer;align-self:flex-end;font-family:var(--serif);font-size:.82rem;letter-spacing:.15em;color:var(--gold);border:1px solid rgba(216,180,106,.55);background:rgba(5,7,13,.55);padding:6px 12px;animation:in .6s both}
+.pin:hover,.pin:focus-visible{background:var(--gold);color:var(--night)}
+.book{position:absolute;z-index:6;left:0;right:0;bottom:0;max-height:86dvh;display:flex;flex-direction:column;background:linear-gradient(to bottom,rgba(13,18,32,.94),rgba(8,11,20,.98));border-top:1px solid rgba(216,180,106,.45);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);transform:translateY(100%);transition:transform .7s cubic-bezier(.2,.8,.2,1)}
+.book.on{transform:none}
+.book-in{overflow-y:auto;padding:22px max(16px,env(safe-area-inset-right,0px)) 18px max(16px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:20px}
+.book-in>*{width:100%;max-width:520px;margin-inline:auto;box-sizing:border-box}
+.book-x{all:unset;cursor:pointer;position:absolute;top:8px;right:max(10px,env(safe-area-inset-right,0px));width:36px;height:36px;display:grid;place-items:center;color:var(--mute);font-size:1.3rem}
+.book-x:focus-visible{outline:1px solid var(--gold)}
+.book h2{margin:0;font-family:var(--serif);font-weight:900;font-size:1.45rem;letter-spacing:.12em}
+.book .kick{margin:0 0 6px;font-size:.7rem;letter-spacing:.4em;color:var(--cinnabar)}
+.book .meta{margin:6px 0 0;font-size:.8rem;color:var(--mute);letter-spacing:.08em}
+.book h3{margin:0 0 8px;font-family:var(--serif);font-size:.86rem;letter-spacing:.3em;color:var(--gold);font-weight:700}
+.toc{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;border-top:1px solid var(--line)}
+.toc li{display:grid;grid-template-columns:4.2em 1fr;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:.9rem;line-height:1.6}
+.toc li b{font-family:var(--serif);color:var(--gold);font-weight:700;font-size:.82rem;letter-spacing:.1em}
+.toc li small{display:block;color:var(--mute);font-size:.76rem}
+.tease{display:flex;flex-wrap:wrap;gap:8px}
+.tease span{font-family:var(--serif);font-size:.86rem;padding:6px 12px;border:1px solid rgba(216,180,106,.4)}
+.tease b{filter:blur(4px);color:var(--gold);user-select:none}
+.plans{display:flex;flex-direction:column;gap:8px}
+.plan-opt{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:13px 14px;border:1px solid rgba(216,180,106,.35);cursor:pointer}
+.plan-opt:has(input:checked){border-color:var(--gold);background:rgba(216,180,106,.1)}
+.plan-opt input{accent-color:var(--gold);width:18px;height:18px;margin:0}
+.plan-opt span{font-family:var(--serif);font-size:1rem}
+.plan-opt small{display:block;font-family:var(--sans);font-size:.74rem;color:var(--mute);margin-top:2px}
+.plan-opt em{font-style:normal;font-weight:700;font-variant-numeric:tabular-nums}
+.check{display:flex;gap:10px;align-items:flex-start;font-size:.82rem;line-height:1.6;color:var(--fg);cursor:pointer}
+.check input{accent-color:var(--gold);width:17px;height:17px;margin:2px 0 0;flex:none}
+.check.opt{color:var(--mute)}
+.mail{display:flex;flex-direction:column;gap:4px;font-size:.72rem;letter-spacing:.2em;color:var(--mute)}
+.mail input{background:rgba(5,7,13,.6);border:0;border-bottom:1px solid var(--gold-dim);color:var(--fg);padding:9px 4px;font-size:1rem;letter-spacing:0;font-family:var(--sans)}
+.mail input:focus{outline:none;border-bottom-color:var(--gold)}
+.faq{display:flex;flex-direction:column;gap:2px}
+.faq details{border-bottom:1px solid var(--line);padding:10px 0}
+.faq summary{cursor:pointer;font-size:.88rem;list-style:none;display:flex;justify-content:space-between}
+.faq summary::after{content:"＋";color:var(--gold)}
+.faq details[open] summary::after{content:"－"}
+.faq p{margin:8px 0 0;font-size:.82rem;line-height:1.7;color:var(--mute)}
+.fine{margin:0;font-size:.72rem;color:var(--mute);line-height:1.6}
+.book-bar{flex:none;display:flex;flex-direction:column;gap:6px;padding:12px max(16px,env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 12px) max(16px,env(safe-area-inset-left,0px));border-top:1px solid var(--line);background:rgba(5,7,13,.96)}
+.book-bar>*{width:100%;max-width:520px;margin-inline:auto;box-sizing:border-box}
+.book-bar .err{text-align:center}
+.paybtn{all:unset;cursor:pointer;box-sizing:border-box;text-align:center;background:var(--gold);color:var(--night);font-family:var(--serif);font-weight:900;letter-spacing:.25em;font-size:1.05rem;padding:14px}
+.paybtn:hover,.paybtn:focus-visible{filter:brightness(1.08)}
+.paybtn[aria-disabled="true"]{opacity:.5}
+.later{all:unset;cursor:pointer;text-align:center;font-size:.8rem;color:var(--mute);padding:4px}
+.rt-box>.pin{width:auto;max-width:none;margin-inline:0;margin-right:max(0px,calc((100% - 520px) / 2))}
+.book{padding-top:40px}
+.book-x{top:4px}
+.rt-foot{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);display:flex;flex-wrap:wrap;justify-content:center;gap:4px 14px;padding-inline:16px;font-size:.7rem;letter-spacing:.08em;animation:in 1.6s 2.4s both}
+.rt-foot a{color:rgba(233,228,214,.55);text-decoration:none}
+.rt-foot a:hover,.rt-foot a:focus-visible{color:var(--gold)}
+.check a{color:var(--gold)}
+
+/* ---- 周易問卦 ---- */
+.gua{position:absolute;z-index:3;left:0;right:0;margin-inline:auto;top:31%;width:min(calc(100% - 32px),360px);display:flex;flex-direction:column;align-items:center;gap:10px;opacity:0;transform:translateY(20px);transition:opacity .9s ease,transform 1.1s cubic-bezier(.2,.8,.2,1);pointer-events:none}
+.gua.on{opacity:1;transform:none}
+.gua.away{opacity:0;transform:translateY(-24px) scale(.96)}
+.coins{display:flex;gap:18px;perspective:600px;transition:opacity .6s,height .6s}
+.gua.done{top:22%}.gua.done .coins,.gua.done .gval{opacity:0;height:0;overflow:hidden}
+.coin{--c1:#e7c27a;--c2:#8a5a22;position:relative;width:62px;height:62px;border-radius:50%;background:radial-gradient(circle at 35% 30%,var(--c1),#b8873f 55%,var(--c2));box-shadow:0 0 0 3px #6b4318 inset,0 0 0 7px rgba(255,230,170,.18) inset,0 6px 16px rgba(0,0,0,.55),0 0 18px rgba(231,194,122,.35);transform-style:preserve-3d;display:grid;place-items:center}
+.coin::after{content:"";position:absolute;width:15px;height:15px;background:#1a120b;box-shadow:0 0 0 2px #6b4318}
+.coin b{position:absolute;inset:0;font:700 13px/1 "Noto Serif TC",serif;color:#4a2c0c;display:flex;flex-direction:column;justify-content:space-between;align-items:center;padding:8px 0;opacity:0;transition:opacity .2s}.coin s{text-decoration:none}
+.coin.zi b{opacity:.9}
+.coin.bei{--c1:#d9b26a;--c2:#6d461a}
+.coin.spin{animation:cspin 1s cubic-bezier(.3,.6,.3,1)}
+.coin.spin:nth-child(2){animation-duration:.92s}.coin.spin:nth-child(3){animation-duration:1.06s}
+@keyframes cspin{0%{transform:translateY(0) rotateY(0)}40%{transform:translateY(-70px) rotateY(900deg)}100%{transform:translateY(0) rotateY(1800deg)}}
+.gval{margin:0;font-size:.82rem;letter-spacing:.12em;color:#f3e7c9;text-shadow:0 1px 6px #000;min-height:1.2em;transition:opacity .6s}
+.hex{display:flex;flex-direction:column-reverse;gap:9px;width:100%;padding:12px 0}
+.ln{display:grid;grid-template-columns:44px 1fr 22px;align-items:center;gap:10px;opacity:0;transform:scaleX(.4);transition:opacity .6s,transform .7s cubic-bezier(.2,.8,.2,1)}
+.ln.on{opacity:1;transform:none}
+.ln small{font-size:.7rem;color:rgba(243,231,201,.85);text-shadow:0 1px 4px #000,0 0 8px #000;text-align:right;letter-spacing:.1em}
+.ln .bar{display:flex;gap:0;height:12px}
+.ln .bar i{flex:1;background:linear-gradient(#f6dc9c,#c9953f);border-radius:2px;box-shadow:0 0 12px rgba(246,220,156,.55)}
+.ln.yin .bar{gap:18%}
+.ln.yang .bar i+i{display:none}
+.ln.chg .bar i{background:linear-gradient(#ff9b7a,#e0573f);box-shadow:0 0 14px rgba(224,87,63,.7)}
+.ln em{font-style:normal;color:#e0573f;font-size:.95rem;text-align:center}
+.gname{display:flex;align-items:center;gap:16px;font:700 1.35rem/1.2 "Noto Serif TC",serif;color:#f3e7c9;text-shadow:0 2px 10px #000}
+.gname span,.gpair span{display:flex;align-items:center;gap:8px}
+.gname b,.gpair b{font-weight:400;font-size:1.6em;color:#e7c27a}
+.gname i,.gpair i{font-style:normal;color:#e0573f}
+.gcard{border:1px solid rgba(231,194,122,.3);border-radius:12px;padding:14px 16px;background:rgba(231,194,122,.06)}
+.gpair{display:flex;align-items:center;gap:14px;font:700 1.15rem "Noto Serif TC",serif;margin-bottom:8px}
+.gtxt{margin:0 0 6px;font-family:"Noto Serif TC",serif;line-height:1.8}
+.gcard small{opacity:.7;font-size:.75rem}
+@media (prefers-reduced-motion:reduce){.coin.spin{animation:none}.gua,.ln{transition:opacity .3s}}
+
+/* ---- 命定對象畫像 ---- */
+.mate{position:absolute;z-index:3;left:0;right:0;margin:0 auto;top:9%;width:min(58vw,240px);opacity:0;transform:translateY(24px) scale(.94);transition:opacity 1s ease,transform 1.2s cubic-bezier(.2,.8,.2,1);pointer-events:none;text-align:center}
+.mate.on{opacity:1;transform:none}
+.mate-frame{padding:10px;border-radius:6px;background:linear-gradient(145deg,#6b1d1d,#2a0b0d 60%,#5a1818);box-shadow:0 0 0 1px rgba(231,194,122,.55) inset,0 0 0 5px #2a0b0d inset,0 0 0 6px rgba(231,194,122,.35) inset,0 18px 40px rgba(0,0,0,.6),0 0 30px rgba(224,87,63,.25)}
+.mate-frame svg{display:block;width:100%;height:auto;border-radius:2px}
+.mate figcaption{margin-top:10px;font-size:.78rem;letter-spacing:.12em;color:#f3e7c9;text-shadow:0 1px 6px #000}
+
+.mail textarea{background:rgba(5,7,13,.6);border:0;border-bottom:1px solid var(--gold-dim);color:var(--fg);padding:9px 4px;font-size:1rem;letter-spacing:0;font-family:var(--sans);resize:none;line-height:1.5}
+.mail textarea:focus{outline:none;border-bottom-color:var(--gold)}
+.book .hint{margin:6px 0 0;font-size:.72rem;color:var(--mute);line-height:1.6}
+</style>
+
+<section class="rt" id="rt" aria-label="問事">
+  <div class="rt-bg" id="rt-bg" role="img" aria-label="引路人站在夜晚的廟埕，紅燈籠下指尖停著發光的蝴蝶">
+    <video class="clip on" data-clip="wide" src="v/shot-wide.mp4" poster="v/shot-wide.jpg" muted playsinline loop autoplay preload="auto"></video>
+    <video class="clip" data-clip="face" src="v/shot-face.mp4" poster="v/shot-face.jpg" muted playsinline loop preload="auto"></video>
+    <video class="clip" data-clip="hand" src="v/shot-hand.mp4" poster="v/shot-hand.jpg" muted playsinline loop preload="auto"></video>
+    <video class="clip" data-clip="cast" src="v/shot-cast.mp4" muted playsinline preload="auto"></video>
+    <video class="clip" data-clip="read" src="v/shot-read.mp4" poster="v/shot-read.jpg" muted playsinline loop preload="auto"></video>
+    <video class="clip" data-clip="hush" src="v/shot-hush.mp4" poster="v/shot-hush.jpg" muted playsinline loop preload="auto"></video>
+      <video class="clip" data-clip="toss" src="v/shot-toss.mp4" poster="v/shot-toss.jpg" muted playsinline loop preload="none"></video>
+  </div>
+  <div class="rt-glow"></div>
+  <div class="rt-veil"></div>
+  <div class="chart" id="chart"><svg id="board" viewBox="0 0 400 400" role="img" aria-label="紫微斗數命盤"></svg></div>
+  <div class="slips" id="slips" aria-hidden="true"></div>
+  <canvas class="rt-fx" id="rt-fx" aria-hidden="true"></canvas>
+  <div class="rt-intro" id="rt-intro">
+    <p class="rt-kicker">紫微斗數・問事</p>
+    <h1 class="rt-title">今夜<br>有燈為你而點</h1>
+    <button class="rt-enter" id="rt-enter" type="button">點燈入內</button>
+    <nav class="rt-foot" aria-label="網站資訊"><a href="/">命書與價格</a><a href="faq.html">常見問題</a><a href="account.html">會員</a><a href="terms.html">服務條款</a><a href="privacy.html">隱私權政策</a><a href="refund.html">退款政策</a></nav>
+  </div>
+  <div class="rt-box" id="rt-box" hidden>
+    <button class="pin" id="pin" type="button" hidden></button>
+    <p class="rt-echo" id="rt-echo"></p>
+    <div class="rt-panel">
+      <div class="rt-plate">夜燈<span>引路人</span></div>
+      <p class="rt-topic" id="rt-topic" hidden></p>
+      <p class="rt-line" id="rt-line" aria-live="polite"></p>
+      <div class="rt-reply" id="rt-reply"></div>
+    </div>
+  </div>
+  <div class="book" id="book" role="dialog" aria-modal="true" aria-label="命書" hidden></div>
+  <button class="snd" id="snd" type="button" aria-pressed="true" aria-label="關閉聲音" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path class="on" d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/><path class="off" d="M17 9l5 6M22 9l-5 6"/></svg></button>
+</section>
+
+<script src="yd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/iztro@2.6.2/dist/iztro.min.js"></script>
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+const rt=$("rt"),bg=$("rt-bg"),line=$("rt-line"),reply=$("rt-reply"),echo=$("rt-echo"),topic=$("rt-topic"),chart=$("chart"),slips=$("slips");
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const wait=ms=>new Promise(r=>setTimeout(r,reduce?Math.min(ms,80):ms));
+const S={};
+let token=0,skipType=null;
+
+/* ---------------- 追蹤（正式版接 Meta Pixel / GA4） ---------------- */
+window.dataLayer=window.dataLayer||[];
+function track(event,props={}){const e={event,mode:S.mode||null,price_group:PRICE.group,...props};window.dataLayer.push(e);if(window.fbq)try{fbq("trackCustom",event,props)}catch(_){}}
+
+/* ---------------- 價格分組 A/B ---------------- */
+const GROUPS={a:{std:490,vip:990,add:290,ask1:290,ask3:690,gua1:99,gua3:249},b:{std:1280,vip:1980,add:650,ask1:390,ask3:890,gua1:199,gua3:490}};
+const PRICE={group:"a",...GROUPS.a};  /* 目前固定 A 組，與商品頁價格一致 */
+const nt=n=>"NT$"+n.toLocaleString("en-US");
+
+/* ---------------- 聲音（程式合成，無音檔） ---------------- */
+const Snd={ctx:null,master:null,on:true,
+  start(){if(this.ctx)return;try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return;const ctx=this.ctx=new C();
+    const m=this.master=ctx.createGain();m.gain.value=0;m.connect(ctx.destination);m.gain.linearRampToValueAtTime(this.on?.9:0,ctx.currentTime+3);
+    const len=ctx.sampleRate*3,buf=ctx.createBuffer(1,len,ctx.sampleRate),d=buf.getChannelData(0);let last=0;for(let i=0;i<len;i++){const w=Math.random()*2-1;last=(last+.02*w)/1.02;d[i]=last*3.2}
+    const n=ctx.createBufferSource();n.buffer=buf;n.loop=true;const lp=ctx.createBiquadFilter();lp.type="lowpass";lp.frequency.value=420;const wg=ctx.createGain();wg.gain.value=.16;
+    const lfo=ctx.createOscillator();lfo.frequency.value=.07;const lg=ctx.createGain();lg.gain.value=.08;lfo.connect(lg);lg.connect(wg.gain);
+    n.connect(lp);lp.connect(wg);wg.connect(m);n.start();lfo.start();this.wind=lp;
+    const dg=ctx.createGain();dg.gain.value=.022;dg.connect(m);[110,110.6,164.8].forEach(f=>{const o=ctx.createOscillator();o.type="sine";o.frequency.value=f;o.connect(dg);o.start()});
+    const chimeLoop=()=>{if(!this.ctx)return;this.chime([1318.5,1568,1760,2093,2349.3][Math.floor(Math.random()*5)],.035,3.5);setTimeout(chimeLoop,4000+Math.random()*6000)};setTimeout(chimeLoop,2500);
+  }catch(_){this.ctx=null}},
+  chime(f,g=.05,dur=2.5){const ctx=this.ctx;if(!ctx)return;const t=ctx.currentTime;const o=ctx.createOscillator(),o2=ctx.createOscillator(),e=ctx.createGain();o.type="sine";o.frequency.value=f;o2.type="sine";o2.frequency.value=f*2.76;const e2=ctx.createGain();e2.gain.value=.25;
+    o2.connect(e2);e2.connect(e);o.connect(e);e.connect(this.master);e.gain.setValueAtTime(0,t);e.gain.linearRampToValueAtTime(g,t+.01);e.gain.exponentialRampToValueAtTime(.0001,t+dur);o.start(t);o2.start(t);o.stop(t+dur);o2.stop(t+dur)},
+  pluck(i){this.chime([523.3,587.3,659.3,784,880,1046.5][i%6],.03,1.4)},
+  gong(){this.chime(98,.12,6);this.chime(196.5,.05,5)},
+  sweep(){const ctx=this.ctx;if(!ctx||!this.wind)return;const t=ctx.currentTime;this.wind.frequency.cancelScheduledValues(t);this.wind.frequency.setValueAtTime(420,t);this.wind.frequency.linearRampToValueAtTime(2600,t+2.5);this.wind.frequency.linearRampToValueAtTime(420,t+5);[1046.5,1318.5,1568,2093].forEach((f,i)=>setTimeout(()=>this.chime(f,.04,3),i*350))},
+  toggle(){this.on=!this.on;if(this.master)this.master.gain.setTargetAtTime(this.on?.9:0,this.ctx.currentTime,.3);return this.on}};
+$("snd").onclick=()=>{const on=Snd.toggle();$("snd").setAttribute("aria-pressed",on);$("snd").setAttribute("aria-label",on?"關閉聲音":"開啟聲音")};
+
+/* ---------------- 蝴蝶粒子 ---------------- */
+const cv=$("rt-fx"),cx=cv.getContext("2d");let W=0,H=0,flies=[],burst=false,running=false;
+function resize(){const d=devicePixelRatio||1;W=cv.clientWidth;H=cv.clientHeight;cv.width=W*d;cv.height=H*d;cx.setTransform(d,0,0,d,0,0)}
+function fly(){return{x:Math.random()*W,y:H*(.25+Math.random()*.7),s:5+Math.random()*7,ph:Math.random()*6,vx:(Math.random()-.5)*.35,vy:-.15-Math.random()*.3,a:0}}
+function tick(t){
+  cx.clearRect(0,0,W,H);
+  for(const f of flies){
+    f.x+=f.vx*(burst?6:1)+Math.sin(t/900+f.ph)*.3;f.y+=f.vy*(burst?9:1);f.a=Math.min(1,f.a+.01);
+    if((f.y<-20||f.x<-20||f.x>W+20)&&!burst)Object.assign(f,fly(),{y:H+10});
+    const flap=Math.abs(Math.sin(t/140+f.ph));
+    cx.save();cx.translate(f.x,f.y);cx.globalAlpha=f.a*.85;cx.shadowColor="rgba(150,185,255,.9)";cx.shadowBlur=14;cx.fillStyle="rgba(190,210,255,.75)";
+    for(const side of[-1,1]){cx.beginPath();cx.ellipse(side*f.s*.55*flap,-f.s*.2,f.s*.6*flap+.6,f.s*.75,side*.5,0,7);cx.fill();cx.beginPath();cx.ellipse(side*f.s*.4*flap,f.s*.45,f.s*.35*flap+.4,f.s*.45,side*.3,0,7);cx.fill()}
+    cx.restore();
+  }
+  if(!reduce)requestAnimationFrame(tick);
+}
+function startFx(n=9){resize();flies=Array.from({length:n},fly);burst=false;if(reduce)tick(0);else if(!running){running=true;requestAnimationFrame(tick)}}
+function scatter(){burst=true;for(let i=0;i<26;i++)flies.push(Object.assign(fly(),{a:1}));setTimeout(()=>{burst=false;flies=Array.from({length:7},fly)},2600)}
+addEventListener("resize",resize);
+
+/* ---------------- 鏡頭 ---------------- */
+const SHOTS={wide:["wide",1.06,"0","2%"],face:["face",1,"0","0"],close:["face",1.07,"0","2%"],hand:["hand",1,"0","0"],mid:["wide",1.12,"0","4%"],read:["read",1,"0","0"],hush:["hush",1,"0","0"],cast:["cast",1,"0","0"],toss:["toss",1,"0","0"]};
+const FALLBACK={read:["wide",1.18,"0","6%"],hush:["face",1.1,"0","3%"],cast:["wide",1.3,"0","10%"],toss:["hand",1.06,"0","2%"]};
+const clips={};document.querySelectorAll(".clip").forEach(v=>{clips[v.dataset.clip]=v;v.addEventListener("error",()=>v.dataset.bad="1",{once:true})});
+const ok=c=>{const v=clips[c];return v&&!v.dataset.bad&&v.networkState!==3};
+function shot(k){
+  let [c,z,tx,ty]=SHOTS[k];
+  if(!ok(c))[c,z,tx,ty]=FALLBACK[k]||SHOTS.wide;
+  for(const n in clips){const on=n===c;clips[n].classList.toggle("on",on);if(on){if(n==="cast")clips[n].currentTime=0;const p=clips[n].play();p&&p.catch(()=>{})}}
+  bg.style.setProperty("--z",z);bg.style.setProperty("--tx",tx);bg.style.setProperty("--ty",ty);
+  return c;
+}
+
+/* ---------------- 對話元件 ---------------- */
+async function say(text,t,{tap=false,long=false,veiled=""}={}){
+  line.classList.toggle("long",long);line.textContent="";let done=reduce;skipType=()=>done=true;
+  for(const ch of text){if(t!==token)return;if(done){line.textContent=text;break}line.textContent+=ch;line.scrollTop=line.scrollHeight;await wait("，。…？！".includes(ch)?220:42)}
+  skipType=null;if(t!==token)return;
+  if(veiled){const v=document.createElement("span");v.className="veiled";v.setAttribute("aria-hidden","true");v.textContent=veiled;line.appendChild(v)}
+  const c=document.createElement("span");c.className=tap?"tap":"caret";line.appendChild(c);
+  if(tap){await new Promise(r=>{const go=()=>{line.removeEventListener("click",go);rt.removeEventListener("keydown",key);r()};const key=e=>{if(e.key==="Enter"||e.key===" ")go()};line.addEventListener("click",go);rt.addEventListener("keydown",key)})}
+  else await wait(380);
+}
+line.addEventListener("click",()=>skipType&&skipType());
+function said(text){echo.innerHTML=text?"<b></b>":"";if(text)echo.firstChild.textContent=text}
+function setTopic(t){topic.hidden=!t;topic.textContent=t||""}
+function chips(opts,cls){return new Promise(res=>{reply.innerHTML="";const box=cls?Object.assign(document.createElement("div"),{className:cls}):reply;if(cls)reply.appendChild(box);
+  opts.forEach((o,i)=>{const b=document.createElement("button");b.type="button";b.className="chip"+(o.cls?" "+o.cls:"");b.innerHTML=o.html||o.label;b.style.animationDelay=(i*50)+"ms";
+    if(o.toggle){b.setAttribute("aria-pressed","false");b.onclick=()=>{const on=b.getAttribute("aria-pressed")!=="true";b.setAttribute("aria-pressed",on);o.toggle(on)}}
+    else b.onclick=()=>{reply.innerHTML="";res(o)};box.appendChild(b)})})}
+function field(type,ph,check,skipLabel){return new Promise(res=>{reply.innerHTML="";
+  const f=document.createElement("form");f.className="field";const i=document.createElement("input");i.type=type;i.placeholder=ph;i.id="rt-in-"+type;i.setAttribute("aria-label",ph);i.autocomplete=type==="email"?"email":"off";
+  const b=document.createElement("button");b.className="chip";b.type="submit";b.textContent="告訴她";f.append(i,b);reply.appendChild(f);
+  const e=document.createElement("p");e.className="err";
+  if(skipLabel){const k=document.createElement("button");k.type="button";k.className="chip quiet";k.textContent=skipLabel;k.onclick=()=>{reply.innerHTML="";res(null)};reply.appendChild(k)}
+  f.onsubmit=ev=>{ev.preventDefault();const v=i.value.trim();const bad=check&&check(v);if(bad){e.textContent=bad;reply.appendChild(e);return}reply.innerHTML="";res(v)};
+  setTimeout(()=>i.focus({preventScroll:true}),60)})}
+/* 名字＋性別一次問完 */
+function whoForm(ph,labels){return new Promise(res=>{reply.innerHTML="";
+  const f=document.createElement("form");f.className="who";const i=document.createElement("input");i.placeholder=ph;i.id="rt-in-who-"+labels[0].length;i.setAttribute("aria-label",ph);i.autocomplete="off";
+  const row=document.createElement("div");row.className="pair";const e=document.createElement("p");e.className="err";
+  labels.forEach(([lab,v])=>{const b=document.createElement("button");b.type="submit";b.className="chip";b.textContent=lab;b.value=v;row.appendChild(b)});
+  f.append(i,row);reply.appendChild(f);
+  f.onsubmit=ev=>{ev.preventDefault();const sex=ev.submitter&&ev.submitter.value;const v=i.value.trim();
+    const bad=!v?"先留個名字":v.length>12?"名字請在 12 個字以內":"";if(bad){e.textContent=bad;f.appendChild(e);i.focus();return}
+    reply.innerHTML="";res({name:v,sex:sex||labels[0][1]})};
+  setTimeout(()=>i.focus({preventScroll:true}),60)})}
+/* 生日：年／月／日下拉＋國曆農曆 */
+function dobForm(def){return new Promise(res=>{reply.innerHTML="";let cal="solar";
+  const f=document.createElement("form");f.className="dob";
+  const calRow=document.createElement("div");calRow.className="cal";
+  const mk=(lab,v)=>{const b=document.createElement("button");b.type="button";b.className="chip";b.textContent=lab;b.setAttribute("aria-pressed",v===cal);b.onclick=()=>{cal=v;calRow.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));fillDays()};return b};
+  calRow.append(mk("國曆","solar"),mk("農曆","lunar"));
+  const sel=document.createElement("div");sel.className="sel";
+  const pick=(label,id,opts,val)=>{const l=document.createElement("label");l.textContent=label;const s=document.createElement("select");s.id=id;opts.forEach(([v,t])=>{const o=document.createElement("option");o.value=v;o.textContent=t;if(v==val)o.selected=true;s.appendChild(o)});l.appendChild(s);sel.appendChild(l);return s};
+  const years=[];for(let y=2012;y>=1930;y--)years.push([y,y+" 年"]);
+  const ys=pick("年","dob-y-"+def.k,years,def.y),ms=pick("月","dob-m-"+def.k,Array.from({length:12},(_,i)=>[i+1,(i+1)+" 月"]),def.m),ds=pick("日","dob-d-"+def.k,[],def.d);
+  function fillDays(){const keep=+ds.value||def.d;const max=cal==="lunar"?30:new Date(+ys.value,+ms.value,0).getDate();ds.innerHTML="";for(let d=1;d<=max;d++){const o=document.createElement("option");o.value=d;o.textContent=(cal==="lunar"?lunarDay(d):d+" 日");if(d===Math.min(keep,max))o.selected=true;ds.appendChild(o)}}
+  ys.onchange=ms.onchange=fillDays;fillDays();
+  const row=document.createElement("div");row.className="row";const e=document.createElement("p");e.className="err";const b=document.createElement("button");b.type="submit";b.className="chip";b.textContent="告訴她";row.append(e,b);
+  f.append(calRow,sel,row);reply.appendChild(f);
+  f.onsubmit=ev=>{ev.preventDefault();const v={cal,y:+ys.value,m:+ms.value,d:+ds.value};
+    if(window.iztro){try{iztro.astro[cal==="solar"?"bySolar":"byLunar"](...(cal==="solar"?[`${v.y}-${v.m}-${v.d}`,6,"女",true,"zh-TW"]:[`${v.y}-${v.m}-${v.d}`,6,"女",false,true,"zh-TW"]))}catch(_){e.textContent="這一天在曆法上不存在，再確認一下";return}}
+    reply.innerHTML="";res(v)}})}
+const lunarDay=d=>d<=10?"初"+"一二三四五六七八九十"[d-1]:d<20?"十"+"一二三四五六七八九"[d-11]:d===20?"二十":d<30?"廿"+"一二三四五六七八九"[d-21]:"三十";
+const fmtDob=v=>v.cal==="solar"?`國曆 ${v.y} 年 ${v.m} 月 ${v.d} 日`:`農曆 ${v.y} 年 ${v.m} 月${lunarDay(v.d)}`;
+const HOURS=[["子","23–01"],["丑","01–03"],["寅","03–05"],["卯","05–07"],["辰","07–09"],["巳","09–11"],["午","11–13"],["未","13–15"],["申","15–17"],["酉","17–19"],["戌","19–21"],["亥","21–23"]];
+async function askHour(t,q){
+  await say(q,t);if(t!==token)return;
+  const o=await chips([...HOURS.map(([h,r],i)=>({label:h+"時",html:`${h}時<small>${r}</small>`,v:h+"時",i})),{label:"我不知道",cls:"wide",v:"午時",i:6,unknown:true}],"hours");
+  said(o.label);return o;
+}
+
+/* ---------------- 排盤引擎 ---------------- */
+const BR=["子","丑","寅","卯","辰","巳","午","未","申","酉","戌","亥"];
+const opp=b=>BR[(BR.indexOf(b)+6)%12];
+const pname=n=>n==="僕役"?"交友":n;
+function computeChart(dob,hourIdx,sex){
+  if(!window.iztro)return demoChart();
+  try{
+    const a=dob.cal==="solar"?iztro.astro.bySolar(`${dob.y}-${dob.m}-${dob.d}`,hourIdx,sex,true,"zh-TW"):iztro.astro.byLunar(`${dob.y}-${dob.m}-${dob.d}`,hourIdx,sex,false,true,"zh-TW");
+    const P={};a.palaces.forEach(p=>P[p.earthlyBranch]={name:pname(p.name),stars:p.majorStars.map(s=>({name:s.name,hua:s.mutagen||""})),minor:[...p.minorStars,...p.adjectiveStars].map(s=>s.name)});
+    const h=a.horoscope(new Date(2027,5,15));const yi=h.yearly.palaceNames.indexOf("命宮");
+    return{P,ming:a.earthlyBranchOfSoulPalace,body:a.earthlyBranchOfBodyPalace,five:a.fiveElementsClass,soul:a.soul,bodyStar:a.body,gz:a.chineseDate,zodiac:a.zodiac,solar:a.solarDate,lunar:a.lunarDate,
+      yearly:{ming:a.palaces[yi].earthlyBranch,hua:{祿:h.yearly.mutagen[0],權:h.yearly.mutagen[1],科:h.yearly.mutagen[2],忌:h.yearly.mutagen[3]}}};
+  }catch(_){return demoChart()}
+}
+function demoChart(){
+  const names={辰:"命宮",卯:"兄弟",寅:"夫妻",丑:"子女",子:"財帛",亥:"疾厄",戌:"遷移",酉:"交友",申:"官祿",未:"田宅",午:"福德",巳:"父母"};
+  const st={巳:["紫微","七殺"],亥:["天府"],辰:["天機","天梁"],卯:["天相"],寅:["太陽","巨門"],丑:["武曲","貪狼"],子:["天同","太陰"],酉:["廉貞","破軍"]};
+  const hua={廉貞:"祿",破軍:"權",武曲:"科",太陽:"忌"};const P={};
+  for(const b of BR)P[b]={name:names[b],stars:(st[b]||[]).map(n=>({name:n,hua:hua[n]||""}))};
+  return{P,ming:"辰",body:"申",five:"水二局",soul:"巨門",bodyStar:"天相",gz:"甲戌 壬申 乙亥 丙戌",zodiac:"狗",yearly:{ming:"未",hua:{祿:"太陰",權:"天同",科:"天機",忌:"巨門"}},demo:true};
+}
+const branchOf=(C,name)=>BR.find(b=>C.P[b].name===name);
+const starsAt=(C,b)=>C.P[b].stars.length?{list:C.P[b].stars.map(s=>s.name),borrowed:false}:{list:C.P[opp(b)].stars.map(s=>s.name),borrowed:true};
+const where=(C,star)=>BR.find(b=>C.P[b].stars.some(s=>s.name===star));
+
+/* ---------------- 命盤繪製 ---------------- */
+const NS="http://www.w3.org/2000/svg",svg=$("board");
+const POS={巳:[0,0],午:[1,0],未:[2,0],申:[3,0],酉:[3,1],戌:[3,2],亥:[3,3],子:[2,3],丑:[1,3],寅:[0,3],卯:[0,2],辰:[0,1]};
+const ORDER=["寅","卯","辰","巳","午","未","申","酉","戌","亥","子","丑"];
+const SZ=100,P=4;
+const el=(tag,a={},parent=svg,text)=>{const e=document.createElementNS(NS,tag);for(const k in a)e.setAttribute(k,a[k]);if(text!=null)e.textContent=text;parent.appendChild(e);return e};
+const xy=b=>{const [c,r]=POS[b];return [c*SZ,r*SZ]};
+const huaColor=h=>h==="忌"?"var(--cinnabar)":h==="祿"?"var(--jade)":"var(--gold)";
+let cells={},starNodes={},L={};
+function build(C){
+  svg.innerHTML="";cells={};starNodes={};
+  for(const b of ORDER){
+    const [x,y]=xy(b);const g=el("g",{class:"fade"});
+    cells[b]={g,rect:el("rect",{x:x+P/2,y:y+P/2,width:SZ-P,height:SZ-P,rx:4,class:"cell"},g)};
+    el("text",{x:x+SZ-10,y:y+SZ-10,"text-anchor":"end",class:"branch"},g,b);
+    cells[b].pn=el("text",{x:x+10,y:y+SZ-10,class:"pname fade"},g,C.P[b].name+(b===C.body&&C.P[b].name!=="命宮"?"・身":""));
+    starNodes[b]=C.P[b].stars.map((s,i)=>{const t=el("g",{class:"pop"},g);el("text",{x:x+12+i*40,y:y+28,class:"star"},t,s.name);return{g:t,name:s.name,hua:s.hua,x:x+12+i*40,y:y+28}});
+  }
+  const c=el("g",{});
+  el("circle",{cx:200,cy:200,r:88,fill:"rgba(8,11,20,.5)",stroke:"rgba(216,180,106,.4)"},c);
+  el("circle",{cx:200,cy:200,r:80,fill:"none",stroke:"rgba(216,180,106,.2)","stroke-dasharray":"2 5"},c);
+  L.c1=el("text",{x:200,y:172,class:"center-t fade","font-size":"14",fill:"rgba(233,228,214,.7)"},c,"");
+  L.c2=el("text",{x:200,y:210,class:"center-t fade","font-size":"26","font-weight":"900"},c,"");
+  L.c3=el("text",{x:200,y:240,class:"center-t fade","font-size":"12",fill:"rgba(233,228,214,.7)"},c,"");
+  L.links=el("g",{});L.marks=el("g",{});L.focus=el("g",{});
+}
+/* 試閱用：亮起指定宮位，其餘變暗；空陣列＝全部恢復 */
+function focusOn(list){
+  L.focus.innerHTML="";const on=new Set(list.map(x=>x.b));
+  for(const b of ORDER)cells[b].g.classList.toggle("muted",on.size>0&&!on.has(b));
+  for(const {b,color="var(--gold)",label=""} of list){const [x,y]=xy(b);const g=el("g",{class:"focus fade"},L.focus);
+    el("rect",{x:x+P/2+1,y:y+P/2+1,width:SZ-P-2,height:SZ-P-2,rx:5,stroke:color},g);
+    if(label)el("text",{x:x+SZ/2,y:y+SZ-26,"text-anchor":"middle",fill:color},g,label);
+    requestAnimationFrame(()=>requestAnimationFrame(()=>g.classList.add("on")))}
+}
+async function setCenter(a,b,c){for(const n of[L.c1,L.c2,L.c3])n.classList.remove("on");await wait(200);L.c1.textContent=a;L.c2.textContent=b;L.c3.textContent=c||"";for(const n of[L.c1,L.c2,L.c3])n.classList.add("on")}
+function badge(s,h,yearly){const dy=yearly?16:0;const g=el("g",{class:"pop"},L.marks);
+  el("rect",{x:s.x,y:s.y+8+dy,width:yearly?26:16,height:14,rx:3,fill:huaColor(h),opacity:yearly?.25:1,stroke:yearly?huaColor(h):"none"},g);
+  el("text",{x:s.x+(yearly?13:8),y:s.y+19+dy,"text-anchor":"middle",class:"hua",fill:yearly?huaColor(h):"#05070d"},g,yearly?"年"+h:h);
+  requestAnimationFrame(()=>g.classList.add("on"))}
+function frame(b,color,label,off=0){const [x,y]=xy(b);const g=el("g",{class:"fade frm"},L.marks);
+  el("rect",{x:x+P/2+3+off,y:y+P/2+3+off,width:SZ-P-6-2*off,height:SZ-P-6-2*off,rx:4,fill:"none",stroke:color,"stroke-width":2,"stroke-dasharray":"5 4"},g);
+  if(label)el("text",{x:x+SZ/2,y:y+58,"text-anchor":"middle","font-size":"11","font-weight":"700",fill:color},g,label);
+  requestAnimationFrame(()=>g.classList.add("on"))}
+function link(a,b,color){const [x1,y1]=xy(a),[x2,y2]=xy(b);const p=el("path",{d:`M${x1+SZ/2} ${y1+SZ/2} Q200 200 ${x2+SZ/2} ${y2+SZ/2}`,class:"link",stroke:color},L.links);requestAnimationFrame(()=>requestAnimationFrame(()=>p.classList.add("on")))}
+async function drawPalaces(){for(const [i,b] of ORDER.entries()){cells[b].g.classList.add("on");Snd.pluck(i);await wait(110)}}
+async function markMing(C){cells[C.ming].rect.classList.add("ming");for(const b of ORDER){cells[b].pn.classList.add("on");await wait(50)}}
+async function dropStars(){for(const b of ORDER)for(const s of starNodes[b]){s.g.classList.add("on");await wait(110)}}
+async function birthHua(){for(const b of ORDER)for(const s of starNodes[b])if(s.hua){badge(s,s.hua);Snd.chime(1568,.03,1.6);await wait(280)}}
+async function yearHua(C){for(const h of["祿","權","科","忌"]){const b=where(C,C.yearly.hua[h]);if(!b)continue;const s=starNodes[b].find(n=>n.name===C.yearly.hua[h]);badge(s,h,true);Snd.chime(1318.5,.03,1.6);await wait(280)}}
+
+/* ---------------- 解讀文字（依真實主星） ---------------- */
+const SELF={
+紫微:"你天生有種讓人信服的氣場，習慣站在做決定的位置，不太喜歡被人指揮。表面隨和，其實心裡對事情的標準很高，誰值得信任、誰只是客套，你分得很清楚。",
+天機:"你腦袋轉得很快，別人還在想問題，你已經在想第三個解法。好奇心強、什麼都想弄懂，但也容易想太多，一件事還沒開始，就先在心裡演完十種結局。",
+太陽:"你是會主動照顧別人的人，熱心、大方、講義氣，在團體裡常常是發光的那一個。只是你給出去的，總比收回來的多，累了也不太說。",
+武曲:"你做事乾脆、重結果，說到做到，對錢和數字天生敏感。外人覺得你有點硬，其實你只是不想把時間浪費在說不清楚的事情上。",
+天同:"你性格溫和、好相處，懂得享受生活，身邊的人和你在一起會覺得放鬆。你不愛衝突，有時寧願自己吞下去，也不想把氣氛弄僵。",
+廉貞:"你外冷內熱，原則很強，愛恨分明。你對自己要求很高，也很在意形象，一旦認定的人和事，會投入到別人想像不到的程度。",
+天府:"你穩重、有分寸，做事講究規劃，給人可靠的感覺。你很會守住手上的東西，不管是錢、人脈還是信任，只是遇到變動時，會比別人更不安。",
+太陰:"你細膩、敏感，很會觀察別人的情緒，常常話還沒說出口你就懂了。你重視安全感，內心世界很豐富，只讓少數人真正走進去。",
+貪狼:"你多才多藝、人緣好，對新鮮事物充滿興趣，總能在人群裡找到樂子。你的企圖心不小，只是興趣太多，有時候不知道該專心在哪一個。",
+巨門:"你觀察力強、口才好，很會抓到事情的漏洞。你習慣先懷疑再相信，所以不容易被騙，但也常因為講話太直，讓人誤會你不好相處。",
+天相:"你公正、有禮貌，很重視人和人之間的分寸，常常是朋友之間的協調者。你很會替別人著想，卻不太會替自己爭取。",
+天梁:"你有一種老靈魂的穩重，朋友有事常常第一個找你商量。你喜歡照顧人、也願意承擔，只是有時候管得太多，自己卻沒人照顧。",
+七殺:"你行動力強、敢衝，越是有挑戰的事越能激起你的鬥志。你不喜歡被綁住，想做就去做，只是衝太快的時候，容易忽略身邊人的感受。",
+破軍:"你不怕改變，甚至喜歡打掉重練，舊的東西不合用就想換掉。你的人生常有大轉折，每一次看似破壞，其實都是你在替自己開新局。"};
+const WORK={
+紫微:"你適合站在能做決定的位置，管理、創業或帶團隊都比當執行者更有發揮空間，而你事業真正的轉折點會落在",
+天機:"你適合靠腦袋吃飯的工作，企劃、技術、顧問類都很對味，但你最大的課題是",
+太陽:"你的事業帶著「被看見」的特質，越公開、越需要面對人群的工作越適合你，而你事業最旺的時期",
+武曲:"你的事業和錢綁得特別緊，財務、業務、技術專業都能做出成績，只是你在",
+天同:"你適合有彈性的工作環境，太高壓的地方反而會消耗你，而真正能讓你發揮的方向是",
+廉貞:"你在工作上很拚、很有企圖心，適合需要專業和形象的領域，但廉貞在官祿宮也代表",
+天府:"你的事業偏向穩健累積，適合大組織或需要管理資源的位置，而你收入真正跳一個層級的時機是",
+太陰:"你適合細膩、需要耐心的工作，幕後規劃、設計、財務都很適合，而你的事業運在",
+貪狼:"你的事業和人脈綁在一起，業務、娛樂、跨領域的工作最適合你，只是貪狼在官祿宮也代表",
+巨門:"你適合靠嘴巴和專業吃飯，教學、顧問、法律、銷售都很有優勢，但巨門也代表你在職場上",
+天相:"你在組織裡很容易被信任，適合協調、行政、合夥的角色，而你的事業貴人多半出現在",
+天梁:"你適合專業型、能幫助別人的工作，醫療、教育、顧問都很適合，而你的事業會在",
+七殺:"你的事業線不會一路平順，而是大起大落型，適合開創、業務或需要衝刺的位置，關鍵在於",
+破軍:"你的事業常常需要轉換跑道，每一次轉換都是升級，而你下一次最重要的轉變會在"};
+const LOVE={
+紫微:"你喜歡的人通常有能力、有主見，但你們之間最大的考驗是誰聽誰的，而你的正緣",
+天機:"你會被聰明、有趣的人吸引，感情裡需要很多交流，但天機在夫妻宮也代表",
+太陽:"你喜歡的人通常有點光芒、講話有份量，你在感情裡付出很多，但容易",
+武曲:"你的感情比較務實，不太相信甜言蜜語，喜歡用行動證明，只是武曲在夫妻宮也代表",
+天同:"你在感情裡想要的是舒服和陪伴，對方最好溫和好相處，而你真正穩定下來的時間",
+廉貞:"你的感情濃烈、愛恨分明，一旦認真就很投入，但廉貞在夫妻宮也代表",
+天府:"你重視感情的穩定和責任感，對象多半成熟可靠，而你的婚姻運",
+太陰:"你在感情裡細膩又敏感，很需要安全感，喜歡溫柔體貼的人，而你的正緣",
+貪狼:"你的桃花不少，感情經驗也豐富，但真正能讓你定下來的人，",
+巨門:"你在感情裡最大的課題是溝通，很多誤會都來自說話方式，而你前一段感情結束的原因",
+天相:"你在感情裡很照顧對方，也很重視公平，喜歡彬彬有禮的人，只是你",
+天梁:"你容易被比你成熟的人吸引，在感情裡也常扮演照顧者，而你的正緣",
+七殺:"你的感情來得快、也來得猛，喜歡有個性的人，但七殺在夫妻宮也代表",
+破軍:"你的感情容易經歷大轉折，但每一次都讓你更清楚自己要什麼，而你的正緣"};
+const TRAIT={紫微:"有主見、有氣場",天機:"聰明、反應快",太陽:"熱情、大方",武曲:"務實、說到做到",天同:"溫和、好相處",廉貞:"外冷內熱、原則很強",天府:"穩重、可靠",太陰:"細膩、溫柔",貪狼:"有趣、人緣好",巨門:"口才好、觀察力強",天相:"有禮、懂分寸",天梁:"成熟、會照顧人",七殺:"敢衝、有個性",破軍:"不怕改變、很有衝勁"};
+const LU={命宮:"今年你本身就是福氣，做什麼都比較順",兄弟:"朋友和手足會帶來助力",夫妻:"感情或合作對象會替你帶財",子女:"投資、學生或晚輩帶來好事",財帛:"正財進帳的機會變多",疾厄:"作息和精神狀態比往年穩",遷移:"出外、跑業務、到外地發展都有利",交友:"人脈會變成機會",官祿:"工作上有加薪或升遷的機會",田宅:"家裡和房子的事有好消息",福德:"心情和享受變多，日子過得比較舒服",父母:"長輩或主管特別照顧你"};
+const JI={命宮:"容易自己鑽牛角尖",兄弟:"朋友之間的金錢往來要小心",夫妻:"伴侶之間容易誤會",子女:"投資和晚輩的事需要多花心思",財帛:"花錢的地方會變多",疾厄:"作息和休息要排好，別把自己逼太緊",遷移:"出外和交通要多留意",交友:"小人和口舌是非比較多",官祿:"工作上的壓力和變動比較大",田宅:"家裡的事會讓你操心",福德:"心情容易起伏，要留時間給自己",父母:"和長輩或主管的溝通要小心"};
+const LOCK_WORK="三十多歲前後的一次選擇，這次選擇會決定你後十年的收入上限。最適合你的方向是████，要特別避開的是████……";
+const LOCK_LOVE="20██ 年前後，對方的特徵是████，你們認識的場合多半在████，而你要放下的是……";
+const nm=list=>list.join("、");
+/* ---------------- 命定對象畫像（夫妻宮星曜 → 外貌與氣質） ---------------- */
+const MATE={
+  紫微:["面容端正、氣質穩重，帶一點威嚴","有主見、要面子，習慣當做決定的那個人"],
+  天機:["身形清瘦、眼神靈活，看起來斯文","腦筋轉得快、想很多，跟你有聊不完的話"],
+  太陽:["臉型方圓、氣色明亮，笑起來很開朗","熱心、愛照顧人，在人群裡很顯眼"],
+  武曲:["骨架結實、五官俐落，說話聲音有力","務實、少說多做，對錢很有概念"],
+  天同:["臉圓、膚色白，帶一點孩子氣","溫和隨和、懂得享受，很好相處"],
+  廉貞:["眉眼鮮明、輪廓立體，有種讓人移不開眼的吸引力","個性強、愛恨分明"],
+  天府:["體格厚實、面容圓潤，穿著講究","穩重、會理財，有包容力"],
+  太陰:["膚色白淨、氣質柔和，眼神溫柔","細膩、顧家，情緒都藏在心裡"],
+  貪狼:["五官亮眼、很會打扮，走到哪都有人緣","多才多藝、愛玩，懂得過生活"],
+  巨門:["嘴型明顯、說話有份量","口才好、愛分析，也容易多疑"],
+  天相:["面容端正、衣著整齊乾淨","溫和有禮、講道理，重承諾"],
+  天梁:["看起來比實際年齡成熟，眉毛濃長","有長輩風範、愛照顧人，偶爾愛說教"],
+  七殺:["濃眉、眼神銳利，骨架結實、膚色偏深","果斷、話不多，行動力很強"],
+  破軍:["體格壯、輪廓粗獷，眼神帶點叛逆","敢衝、不按牌理出牌"]};
+const MATE_MOD=[["天馬","常在外奔波，可能是外地人，或會因為工作分隔兩地"],["紅鸞","氣色好，笑容很有感染力"],["天喜","氣色好，笑容很有感染力"],["天姚","很有異性緣，懂得打扮自己"],["咸池","很有異性緣，懂得打扮自己"],
+  ["文昌","帶書卷氣，說話有條理"],["文曲","有才華，講話好聽"],["左輔","很會照顧人，是你的好幫手"],["右弼","很會照顧人，是你的好幫手"],["祿存","節儉，有存錢的習慣"],
+  ["天魁","背景不錯，自帶貴人氣"],["天鉞","背景不錯，自帶貴人氣"],["擎羊","脾氣來得快，做事急"],["火星","脾氣來得快，做事急"],["鈴星","脾氣來得快，做事急"],["陀羅","慢熱、悶，事情會在心裡拖很久"]];
+function mateOf(C){const b=branchOf(C,"夫妻"),s=starsAt(C,b),src=s.borrowed?opp(b):b;
+  const major=s.list.filter(n=>MATE[n]).slice(0,2);if(!major.length)major.push("紫微");
+  const minor=(C.P[src].minor||[]);const mods=[];MATE_MOD.forEach(([n,t])=>{if(minor.includes(n)&&!mods.some(m=>m[1]===t))mods.push([n,t])});
+  return{stars:[...major,...mods.map(m=>m[0])].slice(0,4),borrowed:s.borrowed,look:major.map(n=>MATE[n][0]).join("；"),vibe:major.map(n=>MATE[n][1]).join("；"),mods:mods.slice(0,2).map(m=>m[1])}}
+const MATE_SVG=sex=>`<svg viewBox="0 0 200 260" aria-hidden="true"><defs><radialGradient id="mg" cx="50%" cy="38%" r="60%"><stop offset="0" stop-color="#f6dc9c" stop-opacity=".55"/><stop offset="1" stop-color="#3a1414" stop-opacity="0"/></radialGradient><filter id="mb"><feGaussianBlur stdDeviation="7"/></filter></defs>
+  <rect width="200" height="260" fill="#1b0d10"/><rect width="200" height="260" fill="url(#mg)"/>
+  <g filter="url(#mb)" fill="#0c0608">${sex==="女"?'<path d="M100 40c-34 0-50 26-50 58 0 30 6 62-6 92h112c-12-30-6-62-6-92 0-32-16-58-50-58z"/>':'<path d="M100 46c-26 0-40 14-42 34-2 12 0 20 2 26h80c2-6 4-14 2-26-2-20-16-34-42-34z"/>'}<ellipse cx="100" cy="102" rx="31" ry="38"/><path d="M84 136h32l4 20 46 14c14 6 22 20 24 40v50H10v-50c2-20 10-34 24-40l46-14z"/></g>
+  <text x="100" y="118" text-anchor="middle" font-size="44" fill="#f6dc9c" opacity=".55" font-family="serif">?</text></svg>`;
+
+const REL=[["一個人","single"],["有曖昧對象","crush"],["交往中","dating"],["已婚","married"]];
+const JOBS=[["還在念書","study"],["在上班","work"],["自己做生意","biz"],["接案自由業","free"],["在找工作","seek"],["暫時休息","rest"]];
+const REL_LOVE={single:"你現在一個人，所以我先說你會被什麼樣的人吸引。",crush:"你心裡已經有個人了，我先說說你們之間會卡在哪裡。",dating:"你身邊已經有人了，那我說說這段關係裡你最容易累的地方。",married:"你已經成家，這裡我看的是你和另一半相處的課題。"};
+const JOB_WORK={study:"你還在念書，現在選的方向會影響很久。",work:"你在上班，",biz:"你自己做生意，這段對你特別重要。",free:"你接案過日子，收入起伏你比誰都清楚。",seek:"你正在找工作，我直接說你適合往哪裡走。",rest:"你暫時停下來了，這不是壞事。"};
+const REL_YEAR={single:"單身的你，",crush:"曖昧中的你，",dating:"有伴的你，",married:"已婚的你，"};
+const LOVE_HOOK={single:"正緣出現　<b>20██</b> 年",crush:"關係明朗　<b>20██</b> 年 <b>█</b> 月",dating:"適合定下來　<b>20██</b> 年",married:"感情轉折　<b>20██</b> 年"};
+const WORK_HOOK={study:"適合方向　<b>████</b>",work:"升遷或轉職　<b>20██</b> 年",biz:"最旺財年　<b>20██</b> 年",free:"最旺財年　<b>20██</b> 年",seek:"下一份工作　<b>20██</b> 年 <b>█</b> 月",rest:"重新出發　<b>20██</b> 年 <b>█</b> 月"};
+const BOOK={
+  base:{name:"夜燈・紫微命書",meta:"五章二十一節・約一萬四千字・附命定對象畫像・PDF 永久保存",toc:[["第一章","命宮：你是什麼樣的人","個性、天賦、盲點，還有身宮透露的後半生課題"],["第二章","官祿與財帛：工作和錢","適合的方向、轉職時機、錢怎麼進來又怎麼留住"],["第三章","夫妻、子女與交友","正緣或另一半的特徵與畫像、子女緣、感情模式、貴人與小人"],["第四章","三件大事：考試、搬遷、合夥","各自看哪幾宮，以及未來幾年的時機"],["第五章","十年大限：人生的節奏","每十年的主題，哪一段最順、哪一段要守"],["附錄","2027 丁未流年提醒","明年最該注意的三件事"]]},
+  year:{name:"夜燈・丁未流年書",meta:"總論＋十二個月逐月・約八千字・PDF 永久保存",toc:[["總論","2027 整體運勢","流年命宮與四化，今年的主旋律"],["逐月","一月到十二月","每個月的重點、該衝和該守的時候"],["財運","錢的進與出","進帳月份、破財月份、投資提醒"],["感情","桃花與關係","單身看桃花，有伴看磨合"],["工作","轉機與壓力","升遷、轉職、合作的時機"]]},
+  pair:{name:"夜燈・合盤書",meta:"五章・約八千字・PDF 永久保存",toc:[["第一章","你們為什麼會遇見","吸引點與緣分指數的完整解析"],["第二章","相處模式","誰主導、誰讓步、怎麼溝通最順"],["第三章","衝突與化解","最容易吵的主題，以及化解的方法"],["第四章","未來走向","定下來的時間點、適合的分工"],["第五章","給你們的話","雙方各自要調整的地方"]]}};
+const FAQ=[["附贈的那一題怎麼算？","結帳時可以寫下一件最想問的事（60 字以內），命書最後會多一個附錄專門回答，約 800 到 1,200 字。「什麼時候」的問題會依你的流年、流月給時間範圍參考。不回答彩券號碼、投資標的、病情與官司輸贏。沒寫也沒關係，之後可以再加購追問。"],["追問是怎麼算的？","一題只問一件事，可以針對回答再補問一次；購買後 30 天內使用，每題回答約 800 到 1,200 字。只回答和你命盤有關的問題；「什麼時候」的問題可以給時間範圍參考，但不判斷官司輸贏、金額、醫療療效或投資標的。讀完命書後也可以再單獨加購。追問屬於數位內容，不適用七天鑑賞期，購買後不退款。"],["付款後怎麼看？","付款成功後，夜燈會在這裡把話說完，同時把完整命書的 PDF 寄到你的 Email，之後隨時可以重看。"],["要等多久？","通常 1 到 3 分鐘內完成。"],["我的生辰資料會怎麼處理？","只用來排盤和產生你的命書，不公開、不轉賣。你可以隨時寫信要求刪除。"],["可以退款嗎？","命書是依你的生辰即時產生的數位內容，開通後無法退款。如果因為系統問題沒有產生內容，會全額退款。"],["準嗎？","命盤依紫微斗數的傳統規則計算，解讀僅供參考與娛樂，人生的決定權永遠在你手上。"]];
+function lead(C,b,label){const s=starsAt(C,b);return{star:s.list[0]||"紫微",text:s.borrowed?`${label}沒有主星，借對宮的${nm(s.list)}來看。`:`${label}見${nm(s.list)}，`}}
+function buildReport(C,C2){
+  if(S.mode==="base"){
+    const m=lead(C,C.ming,"命宮"),w=lead(C,branchOf(C,"官祿"),"官祿宮"),l=lead(C,branchOf(C,"夫妻"),"夫妻宮");
+    return{hooks:[LOVE_HOOK[S.rel]||LOVE_HOOK.single,WORK_HOOK[S.job]||WORK_HOOK.work,S.like?"命定對象　<b>畫像</b>":"一生貴人　<b>████</b>"],secs:[
+      {h:"個性",open:m.text+SELF[m.star],at:[{b:C.ming,label:"命宮"}],c:["命宮",starsAt(C,C.ming).list.join("・")||"—",C.five]},
+      {h:"工作",open:(JOB_WORK[S.job]||"")+w.text+WORK[w.star],locked:LOCK_WORK,at:[{b:branchOf(C,"官祿"),label:"官祿"},{b:branchOf(C,"財帛"),label:"財帛"}],c:["官祿宮",starsAt(C,branchOf(C,"官祿")).list.join("・")||"—","工作與錢"]},
+      {h:"感情",open:(REL_LOVE[S.rel]||"")+l.text+LOVE[l.star],locked:LOCK_LOVE,at:[{b:branchOf(C,"夫妻"),color:"var(--cinnabar)",label:"夫妻"}],c:["夫妻宮",starsAt(C,branchOf(C,"夫妻")).list.join("・")||"—","感情與正緣"]}]};
+  }
+  if(S.mode==="year"){
+    const ym=C.P[C.yearly.ming].name,lu=C.P[where(C,C.yearly.hua.祿)||C.ming].name,ji=C.P[where(C,C.yearly.hua.忌)||C.ming].name;
+    const fq=C.P[BR[(BR.indexOf(branchOf(C,"夫妻"))+BR.indexOf(C.yearly.ming)-BR.indexOf(C.ming)+12)%12]].name;
+    return{hooks:["轉運月份　<b>█</b> 月",S.job==="seek"||S.job==="rest"?"找到工作　<b>█</b> 月":"破財月份　<b>█</b> 月",S.rel==="married"||S.rel==="dating"?"感情考驗　<b>█</b> 月":"桃花月份　<b>█</b> 月"],secs:[
+      {h:"整體運勢",at:[{b:C.yearly.ming,color:"var(--cinnabar)",label:"流年命宮"}],c:["2027 丁未",`流年命宮・${ym}`,`祿${C.yearly.hua.祿}・忌${C.yearly.hua.忌}`],open:`2027 丁未年，你的流年命宮走到本命的${ym}宮。${C.yearly.hua.祿}化祿落在你的${lu}宮，${LU[lu]||"今年有貴人"}；${C.yearly.hua.忌}化忌落在${ji}宮，${JI[ji]||"有些事要多留意"}。`},
+      {h:"財運",at:[{b:where(C,C.yearly.hua.忌)||C.ming,color:"var(--cinnabar)",label:"化忌"},{b:branchOf(C,"財帛"),label:"財帛"}],c:["財運",`忌入${ji}`,"進與出"],open:`財運方面，錢會進來，但化忌落在${ji}宮代表`,locked:"下半年有一筆因為合作或家人產生的支出，集中在 █ 月和 █ 月。投資方面適合████，要避開████……"},
+      {h:"感情",at:[{b:BR[(BR.indexOf(branchOf(C,"夫妻"))+BR.indexOf(C.yearly.ming)-BR.indexOf(C.ming)+12)%12],color:"var(--cinnabar)",label:"流年夫妻"}],c:["感情",`流年夫妻・${fq}`,"桃花與磨合"],open:`感情方面，${REL_YEAR[S.rel]||""}流年的夫妻宮走到你本命的${fq}宮，`,locked:"這代表 █ 月會有一次關鍵的對話，處理得好感情會升溫，處理不好可能走到分岔路。正桃花月份是 █ 月與 ██ 月……"}]};
+  }
+  const a=starsAt(C,branchOf(C,"夫妻")).list[0]||"紫微",b=starsAt(C2,C2.ming).list[0]||"紫微";
+  const same=a===b;
+  return{hooks:["最佳結婚年　<b>20██</b>","最大雷區　<b>████</b>","誰比較愛　<b>██</b>"],secs:[
+    {h:"你們的相處",at:[{b:branchOf(C,"夫妻"),label:"你的夫妻"},{b:C2.ming,color:"var(--jade)",label:"對方命宮"}],c:["你們的相處",`${a}・${b}`,`緣分指數 ${S.score||""}`],open:`你的夫妻宮見${a}，代表你會被${TRAIT[a]}的人吸引；${S.pname}的命宮坐${b}，是個${TRAIT[b]}的人。${same?"對方剛好就是你會心動的那一型。":"對方和你想像中的類型不太一樣，卻正好補上你缺的那一塊。"}`},
+    {h:"衝突點",at:[{b:C.ming,color:"var(--cinnabar)",label:"你的命宮"},{b:C2.ming,color:"var(--jade)",label:"對方命宮"}],c:["衝突點","步調","最容易吵的主題"],open:`你們吵架通常不是因為大事，而是步調。你的命宮見${starsAt(C,C.ming).list.join("、")||"空宮"}，${S.pname}是${b}的性格，所以`,locked:"對方會覺得你想太多、你會覺得對方太衝。最容易爆發的主題是████，多半在 █ 月前後。化解方法是████……"},
+    {h:"未來走向",at:[{b:branchOf(C,"夫妻"),label:"夫妻"},{b:opp(branchOf(C,"夫妻")),label:"官祿"}],c:["未來走向","越磨越穩","定下來的時間點"],open:`四化在你們之間的流動顯示，這段關係是「越磨越穩」型，前兩年考驗最多，`,locked:"真正定下來的時間點在 20██ 年。如果要一起創業或合夥，最適合的分工是████，要避開的是████……"}]};
+}
+function pairScore(C,C2){
+  let s=68;const fq=branchOf(C,"夫妻");
+  if(C2.ming===fq)s+=16;else if([opp(fq),BR[(BR.indexOf(fq)+4)%12],BR[(BR.indexOf(fq)+8)%12]].includes(C2.ming))s+=9;
+  for(const b of BR){const hs=C2.P[b].stars.map(x=>x.hua);if(hs.includes("祿")&&[C.ming,fq].includes(b))s+=6;if(hs.includes("忌")&&[C.ming,fq].includes(b))s-=5}
+  return Math.max(61,Math.min(96,s));
+}
+
+/* ---------------- 排盤：她一邊說，盤一邊亮 ---------------- */
+async function cast(t){
+  const C=S.C,md=S.mode;
+  build(C);$("rt-box").hidden=false;chart.classList.remove("away","read");chart.classList.add("on");setTopic("");said("");
+  const dstr=C.solar?C.solar.replaceAll("-","/"):"";
+  if(md==="pair"){
+    const C2=S.C2;
+    const both=Promise.all([setCenter(S.name,dstr,S.hour),drawPalaces().then(()=>markMing(C)).then(dropStars)]);
+    await say("先看你的。",t);await both;if(t!==token)return;
+    await setCenter(S.pname,C2.solar?C2.solar.replaceAll("-","/"):"",S.phour);frame(C2.ming,"var(--jade)","對方命宮");
+    const fq=branchOf(C,"夫妻");
+    await say(`${S.pname}的命宮落在${C2.ming}，`+(C2.ming===fq?"正好對上你的夫妻宮。":`在你的盤上，是${C.P[C2.ming].name}的位置。`),t);
+    frame(fq,"var(--gold)","",6);link(fq,C2.ming,"var(--jade)");await wait(600);
+    const h=birthHua();await say("四化在你們之間流動……",t);await h;if(t!==token)return;
+    const sc=S.score=pairScore(C,C2);
+    await setCenter("緣分指數","0","");
+    for(let n=0;n<=sc;n+=reduce?sc:2){L.c2.textContent=Math.min(n,sc);await wait(22)}
+    L.c2.textContent=sc;L.c3.textContent=sc>=85?"互補型・高吸引":sc>=75?"磨合型・越走越穩":"考驗型・需要用心";
+    Snd.gong();
+    await say(`${sc}。`+(sc>=85?"這條線，比你想的還要深。":sc>=75?"不是一見鍾情，是越走越對的那種。":"這段緣分不輕鬆，但不是沒有路。"),t,{tap:true});return;
+  }
+  let p=setCenter("真太陽時",dstr,S.hour);
+  await say("先校正你出生那一刻的天光。",t);await p;
+  p=drawPalaces();await say("十二宮，依序點亮。",t);await p;
+  p=markMing(C);await say(`你的命宮，落在${C.ming}。`,t);await p;
+  const ms=starsAt(C,C.ming);
+  if(md==="base"){
+    await setCenter("五行局",C.five,`命主 ${C.soul}・身主 ${C.bodyStar}`);
+    await say(`${C.five}。命主${C.soul}，身主${C.bodyStar}。`,t);
+    p=dropStars();await say("十四主星，各自落座。",t);await p;
+    p=birthHua();await say("最後，是你出生那年的四化。",t);await p;
+    await setCenter("命宮",ms.list.join("・")||"—",C.five);Snd.gong();
+    await say(ms.borrowed?`命宮無主星，借對宮的${nm(ms.list)}……我看見你了。`:`${nm(ms.list)}守命……我看見你了。`,t,{tap:true});
+  }else{
+    p=dropStars();await say("主星落座。",t);await p;
+    await setCenter("流年","2027 丁未",`流年命宮入${C.yearly.ming}宮`);frame(C.yearly.ming,"var(--cinnabar)","流年命宮");
+    await say(`2027，丁未。流年命宮，走到${C.yearly.ming}宮。`,t);
+    p=yearHua(C);await say(`祿在${C.yearly.hua.祿}，忌在${C.yearly.hua.忌}。`,t);await p;Snd.gong();
+    await say("明年的風向，我看清楚了。",t,{tap:true});
+  }
+}
+
+/* 留名單（可略過） */
+async function keep(t){
+  await say("這張盤，要我替你收好嗎？留個 Email，我把它寄給你。",t);if(t!==token)return;
+  const v=await field("email","你的 Email",x=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(x)?"":"Email 格式好像不太對","不用了");if(t!==token)return;
+  if(v){S.email=v;said(v);track("lead_submit");await say("收到了。",t)}else{said("不用了");track("lead_skip")}
+}
+
+async function reading(t){
+  const r=S.R=buildReport(S.C,S.C2);
+  chart.classList.add("read");rt.classList.add("dim","reading");shot("read");said("");
+  await wait(700);
+  const pin=$("pin");pin.textContent=`直接看完整${S.mode==="year"?"流年書":S.mode==="pair"?"合盤書":"命書"} ${nt(PRICE.std)} 起`;pin.hidden=false;
+  pin.onclick=()=>{const t2=++token;track("pin_click");paywall(t2,true)};
+  await say(`${S.name}，我看完了。從你最在意的開始說吧。`,t,{tap:true});if(t!==token)return;
+  for(const [i,s] of r.secs.entries()){
+    setTopic(s.h);track("report_section",{index:i});
+    if(s.at)focusOn(s.at.filter(x=>x.b));if(s.c)setCenter(...s.c);
+    await say(s.open,t,{tap:true,long:true,veiled:s.locked||""});if(t!==token)return;
+  }
+  if(S.mode==="base"&&S.like){await matePage(t);if(t!==token)return}
+  paywall(t,false);
+}
+async function matePage(t){
+  const M=S.M=mateOf(S.C);let el=$("mate");if(!el){el=document.createElement("figure");el.className="mate";el.id="mate";rt.appendChild(el)}
+  el.innerHTML=`<div class="mate-frame">${MATE_SVG(S.like)}</div><figcaption>依夫妻宮・${M.stars.join("、")}${M.borrowed?"（借對宮）":""}</figcaption>`;
+  chart.classList.add("away");setTopic("命定對象畫像");rt.classList.add("dim");shot("read");requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add("on")));track("mate_view",{stars:M.stars.join(",")});
+  await say(`我還替你看了那個人的樣子。${M.look}，`,t,{tap:true,long:true,veiled:`${M.vibe}。${M.mods.join("；")}。你們第一次見面的場合，多半在████……`});
+  el.classList.remove("on");
+}
+async function paywall(t,quick){
+  $("pin").hidden=true;const me=$("mate");if(me)me.classList.remove("on");setTopic("");
+  if(L.focus)focusOn([]);chart.classList.add("away");rt.classList.remove("dim","reading");shot("hush");Snd.gong();track("paywall_view",{quick});
+  if(quick){await say("好，命書在這裡。",t)}
+  else{await say("剩下的，不能白白說給你聽。",t);if(t!==token)return;await say("想聽完整的，就為自己點一盞燈吧。",t)}
+  if(t!==token)return;
+  openBook(t);
+}
+function openBook(t){
+  const bk=$("book"),B=BOOK[S.mode],r=S.R;let plan="std",add=false;
+  const extra=S.mode==="year"?"紫微命書":"2027 流年書";
+  bk.innerHTML=`<div class="book-in">
+    <div><p class="kick">為 ${esc(S.name)} 點的燈</p><h2>${B.name}</h2><p class="meta">${B.meta}</p></div>
+    <section><h3>你的盤上已經寫好的</h3><div class="tease">${r.hooks.map(h=>`<span>${h}</span>`).join("")}</div></section>
+    <section><h3>命書目錄</h3><ol class="toc">${B.toc.map(([a,b,c])=>`<li><b>${a}</b><div>${b}<small>${c}</small></div></li>`).join("")}</ol></section>
+    <section><h3>點哪一盞</h3><div class="plans">
+      <label class="plan-opt"><input type="radio" name="plan" value="std" checked><div><span>點一盞燈</span><small>${S.mode==="base"?"完整命書＋附贈 1 題":"完整"+B.name.replace("夜燈・","")}・PDF 寄到你的 Email</small></div><em>${nt(PRICE.std)}</em></label>
+      <label class="plan-opt"><input type="radio" name="plan" value="vip"><div><span>長明燈</span><small>${S.mode==="base"?"完整命書＋附贈 1 題":"完整"+B.name.replace("夜燈・","")}＋追問 3 題・比分開買省 ${nt(PRICE.std+PRICE.ask3-PRICE.vip)}</small></div><em>${nt(PRICE.vip)}</em></label>
+    </div></section>
+    ${S.mode==="base"?`<section><h3>附贈一題・你最想問的一件事</h3>
+      <label class="mail">選填・60 字以內，命書最後會專門回答這一題<textarea id="bk-ask" maxlength="60" rows="2" placeholder="例如：${esc(askHint())}"></textarea></label>
+      <p class="hint">一次只問一件事。不回答彩券號碼、投資標的、病情與官司輸贏。</p></section>`:""}
+    <label class="mail">寄送命書的 Email<input id="bk-mail" type="email" autocomplete="email" placeholder="you@example.com" value="${esc(S.email||"")}"></label>
+    <div class="plans">
+      <label class="check"><input type="checkbox" id="bk-ok"><span>我了解命書是依生辰即時產生的數位內容，開通後無法退款，並同意<a href="terms.html" target="_blank" rel="noopener">服務條款</a>、<a href="privacy.html" target="_blank" rel="noopener">隱私權政策</a>與<a href="refund.html" target="_blank" rel="noopener">退款政策</a>。</span></label>
+      <label class="check opt"><input type="checkbox" id="bk-news"><span>願意收到夜燈命書的節氣提醒（選填）</span></label>
+    </div>
+    <section class="faq"><h3>常見問題</h3>${FAQ.map(([q,a])=>`<details><summary>${q}</summary><p>${a}</p></details>`).join("")}</section>
+    <p class="fine">解讀依紫微斗數傳統規則，僅供參考與娛樂。</p>
+  </div>
+  <div class="book-bar"><p class="err" id="bk-err" role="alert"></p><button type="button" class="paybtn" id="bk-pay"></button><button type="button" class="later" id="bk-later">再想想</button></div>
+  <button type="button" class="book-x" id="bk-x" aria-label="關閉命書">×</button>`;
+  const pay=$("bk-pay"),err=$("bk-err");
+  bk.addEventListener("input",()=>err.textContent="");bk.addEventListener("change",()=>err.textContent="");
+  const total=()=>PRICE[plan]+(add?PRICE.add:0);
+  const upd=()=>{pay.textContent=`點燈　${nt(total())}`};upd();
+  bk.querySelectorAll('input[name="plan"]').forEach(i=>i.onchange=()=>{plan=i.value;upd();track("plan_select",{plan})});
+  bk.hidden=false;requestAnimationFrame(()=>requestAnimationFrame(()=>bk.classList.add("on")));
+  const later=async()=>{track("paywall_later");closeBook();shot("face");said("");await say("燈會一直替你留著。想好了再來找我。",t);if(t!==token)return;
+    const o=await chips([{label:"再看一次命書",cls:"main",v:"book"},{label:"再問一次",v:"again"}]);if(t!==token)return;
+    if(o.v==="book"){shot("hush");openBook(t)}else open()};
+  $("bk-later").onclick=later;$("bk-x").onclick=later;
+  pay.onclick=async()=>{
+    if(pay.getAttribute("aria-disabled")==="true")return;
+    const mail=$("bk-mail").value.trim();
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)){err.textContent="請留下正確的 Email，命書會寄到這裡";$("bk-mail").focus();return}
+    const askEl=$("bk-ask"),ask=askEl?askEl.value.trim():"";
+    if(ask){const bad=guaCheck(ask,true);if(bad){err.textContent="附贈的那一題："+bad;askEl.focus();return}}
+    if(!$("bk-ok").checked){err.textContent="請先勾選同意數位內容條款";return}
+    if(S.mode==="pair"){err.textContent="合盤書即將開放。現在可以先點紫微命書或流年書。";return}
+    const prof=profilePayload();if(!prof){err.textContent="排盤元件沒有載入完成，請重新整理後再試一次";return}
+    S.email=mail;S.ask=ask;const value=total();if(ask)track("free_ask",{len:ask.length});
+    track("plan_click",{plan,value,newsletter:$("bk-news").checked});
+    const items=[S.mode==="year"?(plan==="vip"?"yvip":"ystd"):plan];
+    pay.setAttribute("aria-disabled","true");pay.textContent="正在前往付款…";
+    try{await YD.checkout({items,email:mail,price_group:PRICE.group,profile:prof,gift_question:S.mode==="base"&&ask?ask:null,
+        agree:true,newsletter:$("bk-news").checked,utm:utm()});track("checkout_redirect",{value})}
+    catch(e){err.textContent=e.message||"建立訂單失敗，請稍後再試";pay.removeAttribute("aria-disabled");upd()}};
+}
+const JOBMAP={study:"study",work:"work",biz:"work",free:"work",seek:"seek",rest:"rest"};
+function profilePayload(){
+  if(!S.C||S.C.demo||!S.C.solar)return null;
+  const [y,m,d]=String(S.C.solar).split("-").map(Number);if(!y||!m||!d)return null;
+  return{nickname:S.name,gender:S.sex==="男"?"male":"female",solar:`${y}-${String(m).padStart(2,"0")}-${String(d).padStart(2,"0")}`,
+    hour_index:S.hourIdx,rel:S.rel||null,kids:S.kids||null,job:JOBMAP[S.job]||null,likes:S.like||null};
+}
+function utm(){const p=new URLSearchParams(location.search),u={};["utm_source","utm_medium","utm_campaign","utm_content","utm_term"].forEach(k=>{const v=p.get(k);if(v)u[k]=v.slice(0,100)});return Object.keys(u).length?u:null}
+function askHint(){if(S.mode==="pair")return"我們適合在哪一年結婚？";if(S.kids==="want")return"我們什麼時候比較適合生小孩？";
+  if(S.job==="seek"||S.job==="rest")return"下一份工作大概什麼時候會來？";if(S.rel==="single"||S.rel==="crush")return"我什麼時候會遇到對的人？";
+  if(S.mode==="year")return"2027 年適合換工作嗎？";return"這兩年適合換工作嗎？"}
+function closeBook(){const bk=$("book");bk.classList.remove("on");setTimeout(()=>{if(!bk.classList.contains("on"))bk.hidden=true},700)}
+const esc=x=>String(x).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+/* ---------------- 周易問卦 ---------------- */
+const GUA=[{"id":"111111","name":"乾","sym":"䷀","ci":"乾：元亨，利貞。","xiang":"天行健，君子以自強不息。","yao":["初九：潛龍，勿用。","九二：見龍在田，利見大人。","九三：君子終日乾乾，夕惕若，厲，無咎。","九四：或躍在淵，無咎。","九五：飛龍在天，利見大人。","上九：亢龍有悔。","用九：見群龍無首，吉。"],"m":"天行健，主動與力量都在你手上，但要懂得收放。"},{"id":"000000","name":"坤","sym":"䷁","ci":"坤：元亨，利牝馬之貞。君子有攸往，先迷後得主，利西南得朋，東北喪朋。安貞，吉。","xiang":"地勢坤，君子以厚德載物。","yao":["初六：履霜，堅冰至。","六二：直，方，大，不習無不利。","六三：含章可貞。或從王事，無成有終。","六四：括囊；無咎，無譽。","六五：黃裳，元吉。","上六：龍戰於野，其血玄黃。","用六：利永貞。"],"m":"順勢而為，用包容與耐心承載，先跟隨、後得主。"},{"id":"100010","name":"屯","sym":"䷂","ci":"元亨，利貞，勿用有攸往，利建侯。","xiang":"雲，雷，屯；君子以經綸。","yao":["初九：磐桓；利居貞，利建侯。","六二：屯如邅如，乘馬班如。匪寇婚媾，女子貞不字，十年乃字。","六三：即鹿無虞，惟入於林中，君子幾不如舍，往吝。","六四：乘馬班如，求婚媾，往吉，無不利。","九五：屯其膏，小貞吉，大貞凶。","上六：乘馬班如，泣血漣如。"],"m":"萬事起頭難，草創期先站穩，不宜躁進。"},{"id":"010001","name":"蒙","sym":"䷃","ci":"蒙：亨。匪我求童蒙，童蒙求我。初筮告，再三瀆，瀆則不告。利貞。","xiang":"山下出泉，蒙；君子以果行育德。","yao":["初六：發蒙，利用刑人，用說桎梏，以往吝。","九二：包蒙吉；納婦吉；子克家。","六三：勿用娶女；見金夫，不有躬，無攸利。","六四：困蒙，吝。","六五：童蒙，吉。","上九：擊蒙；不利為寇，利禦寇。"],"m":"還在摸索，最好的做法是虛心請教、先學再動。"},{"id":"111010","name":"需","sym":"䷄","ci":"需：有孚，光亨，貞吉。利涉大川。","xiang":"雲上於天，需；君子以飲食宴樂。","yao":["初九：需於郊。利用恒，無咎。","九二：需於沙。小有言，終吉。","九三：需於泥，致寇至。","六四：需於血，出自穴。","九五：需於酒食，貞吉。","上六：入於穴，有不速之客三人來，敬之終吉。"],"m":"時機未到，等待不是停滯，是準備。"},{"id":"010111","name":"訟","sym":"䷅","ci":"訟：有孚，窒。惕中吉。終凶。利見大人，不利涉大川。","xiang":"天與水違行，訟；君子以作事謀始。","yao":["初六：不永所事，小有言，終吉。","九二：不克訟，歸而逋，其邑人三百戶，無眚。","六三：食舊德，貞厲，終吉，或從王事，無成。","九四：不克訟，復即命渝，安貞吉。","九五：訟元吉。","上九：或錫之鞶帶，終朝三褫之。"],"m":"容易起爭執，退一步、求和解，比爭到底更有利。"},{"id":"010000","name":"師","sym":"䷆","ci":"貞，丈人，吉無咎。","xiang":"地中有水，師；君子以容民畜眾。","yao":["初六：師出以律，否臧凶。","九二：在師中吉，無咎，王三錫命。","六三：師或輿屍，凶。","六四：師左次，無咎。","六五：田有禽，利執言，無咎。長子帥師，弟子輿屍，貞凶。","上六：大君有命，開國承家，小人勿用。"],"m":"需要組織與紀律，找對帶頭的人，按部就班。"},{"id":"000010","name":"比","sym":"䷇","ci":"吉。原筮元永貞，無咎。不寧方來，後夫凶。","xiang":"地上有水，比；先王以建萬國，親諸侯。","yao":["初六：有孚，比之，無咎。有孚盈缶，終來有他，吉。","六二：比之自內，貞吉。","六三：比之匪人。","六四：外比之，貞吉。","九五：顯比，王用三驅，失前禽。邑人不誡，吉。","上六：比之無首，凶。"],"m":"親近與合作，找到值得依靠的人，一起走。"},{"id":"111011","name":"小畜","sym":"䷈","ci":"小畜：亨。密雲不雨，自我西郊。","xiang":"風行天上，小畜；君子以懿文德。","yao":["初九：復自道，何其咎，吉。","九二：牽復，吉。","九三：輿說輻，夫妻反目。","六四：有孚，血去惕出，無咎。","九五：有孚攣如，富以其鄰。","上九：既雨既處，尚德載，婦貞厲。月幾望，君子征凶。"],"m":"小有積蓄、力量還不夠，先累積，別急著求大成。"},{"id":"110111","name":"履","sym":"䷉","ci":"履虎尾，不咥人，亨。","xiang":"上天下澤，履；君子以辨上下，安民誌。","yao":["初九：素履，往無咎。","九二：履道坦坦，幽人貞吉。","六三：眇能視，跛能履，履虎尾，咥人，凶。武人為於大君。","九四：履虎尾，訴訴，終吉。","九五：夬履，貞厲。","上九：視履考祥，其旋元吉。"],"m":"如履虎尾，小心謹慎地前進，守禮就能過關。"},{"id":"111000","name":"泰","sym":"䷊","ci":"泰：小往大來，吉亨。","xiang":"天地交泰，後以財成天地之道，輔相天地之宜，以左右民。","yao":["初九：拔茅茹，以其彙，征吉。","九二：包荒，用馮河，不遐遺，朋亡，得尚於中行。","九三：無平不陂，無往不復，艱貞無咎。勿恤其孚，於食有福。","六四：翩翩，不富，以其鄰，不戒以孚。","六五：帝乙歸妹，以祉元吉。","上六：城復於隍，勿用師。自邑告命，貞吝。"],"m":"天地交泰，上下通暢，是順利、和諧的時候。"},{"id":"000111","name":"否","sym":"䷋","ci":"否之匪人，不利君子貞，大往小來。","xiang":"天地不交，否；君子以儉德辟難，不可榮以祿。","yao":["初六：拔茅茹，以其匯，貞吉亨。","六二：包承。小人吉，大人否，亨。","六三：包羞。","九四：有命，無咎，疇離祉。","九五：休否，大人吉。其亡其亡，系於苞桑。","上九：傾否，先否後喜。"],"m":"上下不通，暫時閉塞，守住自己，等待轉機。"},{"id":"101111","name":"同人","sym":"䷌","ci":"同人於野，亨。利涉大川，利君子貞。","xiang":"天與火，同人；君子以類族辨物。","yao":["初九：同人於門，無咎。","六二：同人於宗，吝。","九三：伏戎於莽，升其高陵，三歲不興。","九四：乘其墉，弗克攻，吉。","九五：同人，先號啕而後笑。大師克相遇。","上九：同人於郊，無悔。"],"m":"與人同心，合作與共識會帶來突破。"},{"id":"111101","name":"大有","sym":"䷍","ci":"大有：元亨。","xiang":"火在天上，大有；君子以遏惡揚善，順天休命。","yao":["初九：無交害，匪咎，艱則無咎。","六二：同人於宗，吝。","九三：公用亨於天子，小人弗克。","九四：匪其彭，無咎。","六五：厥孚交如，威如；吉。","上九：自天佑之，吉無不利。"],"m":"收穫豐盛，資源在手，懂得分享就能長久。"},{"id":"001000","name":"謙","sym":"䷎","ci":"謙：亨，君子有終。","xiang":"地中有山，謙；君子以裒多益寡，稱物平施。","yao":["初六：謙謙君子，用涉大川，吉。","六二：鳴謙，貞吉。","九三：勞謙，君子有終，吉。","六四：無不利，撝謙。","六五：不富，以其鄰，利用侵伐，無不利。","上六：鳴謙，利用行師，征邑國。"],"m":"謙虛反而得益，低調做事，會被看見。"},{"id":"000100","name":"豫","sym":"䷏","ci":"豫：利建侯，行師。","xiang":"雷出地奮，豫。先王以作樂崇德，殷薦之上帝，以配祖考。","yao":["初六：鳴豫，凶。","六二：介於石，不終日，貞吉。","六三：盱豫，悔。遲有悔。","九四：由豫，大有得。勿疑。朋盍簪。","六五：貞疾，恒不死。","上六：冥豫，成有渝，無咎。"],"m":"心情愉悅、時機成熟，可以準備行動，但別鬆懈。"},{"id":"100110","name":"隨","sym":"䷐","ci":"隨：元亨利貞，無咎。","xiang":"澤中有雷，隨；君子以向晦入宴息。","yao":["初九：官有渝，貞吉。出門交有功。","六二：系小子，失丈夫。","六三：系丈夫，失小子。隨有求得，利居貞。","九四：隨有獲，貞凶。有孚在道，以明，何咎。","九五：孚於嘉，吉。","上六：拘系之，乃從維之。王用亨於西山。"],"m":"順應變化、跟隨對的人事，不必逞強。"},{"id":"011001","name":"蠱","sym":"䷑","ci":"蠱：元亨，利涉大川。先甲三日，後甲三日。","xiang":"山下有風，蠱；君子以振民育德。","yao":["初六：幹父之蠱，有子，考無咎，厲終吉。","九二：幹母之蠱，不可貞。","九三：幹父之蠱，小有悔，無大咎。","六四：裕父之蠱，往見吝。","六五：幹父之蠱，用譽。","上九：不事王侯，高尚其事。"],"m":"舊問題浮上來，正是整頓、修補的時候。"},{"id":"110000","name":"臨","sym":"䷒","ci":"臨：元，亨，利，貞。至於八月有凶。","xiang":"澤上有地，臨；君子以教思無窮，容保民無疆。","yao":["初九：咸臨，貞吉。","九二：咸臨，吉無不利。","六三：甘臨，無攸利。既憂之，無咎。","六四：至臨，無咎。","六五：知臨，大君之宜，吉。","上六：敦臨，吉無咎。"],"m":"機會正在靠近，主動面對、用心經營。"},{"id":"000011","name":"觀","sym":"䷓","ci":"觀：盥而不薦，有孚顒若。","xiang":"風行地上，觀；先王以省方，觀民設教。","yao":["初六：童觀，小人無咎，君子吝。","六二：窺觀，利女貞。","六三：觀我生，進退。","六四：觀國之光，利用賓於王。","九五：觀我生，君子無咎。","上九：觀其生，君子無咎。"],"m":"先觀察、看清楚全局，再決定怎麼做。"},{"id":"100101","name":"噬嗑","sym":"䷔","ci":"噬嗑：亨。利用獄。","xiang":"雷電噬嗑；先王以明罰敕法。","yao":["初九：屨校滅趾，無咎。","六二：噬膚滅鼻，無咎。","六三：噬臘肉，遇毒；小吝，無咎。","九四：噬乾胏，得金矢，利艱貞，吉。","六五：噬乾肉，得黃金，貞厲，無咎。","上九：何校滅耳，凶。"],"m":"有障礙卡在中間，要明快處理，必要時立規矩。"},{"id":"101001","name":"賁","sym":"䷕","ci":"賁：亨。小利有攸往。","xiang":"山下有火，賁；君子以明庶政，無敢折獄。","yao":["初九：賁其趾，舍車而徒。","六二：賁其須。","九三：賁如濡如，永貞吉。","六四：賁如皤如，白馬翰如，匪寇婚媾。","六五：賁於丘園，束帛戔戔，吝，終吉。","上九：白賁，無咎。"],"m":"重視外在與形式的修飾，但內在才是根本。"},{"id":"000001","name":"剝","sym":"䷖","ci":"剝：不利有攸往。","xiang":"山附地上，剝；上以厚下，安宅。","yao":["初六：剝床以足，蔑貞凶。","六二：剝床以辨，蔑貞凶。","六三：剝之，無咎。","六四：剝床以膚，凶。","六五：貫魚，以宮人寵，無不利。","上九：碩果不食，君子得輿，小人剝廬。"],"m":"根基被侵蝕，宜守不宜攻，先保護好自己。"},{"id":"100000","name":"復","sym":"䷗","ci":"復：亨。出入無疾，朋來無咎。反復其道，七日來復，利有攸往。","xiang":"雷在地中，復；先王以至日閉關，商旅不行，後不省方。","yao":["初九：不復遠，無祗悔，元吉。","六二：休復，吉。","六三：頻復，厲無咎。","六四：中行獨復。","六五：敦復，無悔。","上六：迷復，凶，有災眚。用行師，終有大敗，以其國君，凶；至於十年，不克征。"],"m":"一陽來復，低谷已過，正在慢慢回升。"},{"id":"100111","name":"無妄","sym":"䷘","ci":"無妄：元亨，利貞。其匪正有眚，不利有攸往。","xiang":"天下雷行，物與無妄；先王以茂對時，育萬物。","yao":["初九：無妄，往吉。","六二：不耕獲，不災畬，則利有攸往。","六三：無妄之災，或系之牛，行人之得，邑人之災。","九四：可貞，無咎。","九五：無妄之疾，勿藥有喜。","上九：無妄，行有眚，無攸利。"],"m":"不妄為就無災，照著正道走，不投機。"},{"id":"111001","name":"大畜","sym":"䷙","ci":"大畜：利貞，不家食吉，利涉大川。","xiang":"天在山中，大畜；君子以多識前言往行，以畜其德。","yao":["初九：有厲利已。","九二：輿說輹。","九三：良馬逐，利艱貞。曰閑輿衛，利有攸往。","六四：童牛之牿，元吉。","六五：豶豕之牙，吉。","上九：何天之衢，亨。"],"m":"大量累積的時候，蓄積實力，為下一步做準備。"},{"id":"100001","name":"頤","sym":"䷚","ci":"頤：貞吉。觀頤，自求口實。","xiang":"山下有雷，頤；君子以慎言語，節飲食。","yao":["初九：舍爾靈龜，觀我朵頤，凶。","六二：顛頤，拂經，於丘頤，征凶。","六三：拂頤，貞凶，十年勿用，無攸利。","六四：顛頤，吉，虎視眈眈，其欲逐逐，無咎。","六五：拂經，居貞吉，不可涉大川。","上九：由頤，厲吉，利涉大川。"],"m":"重在養，照顧好身心與言語，也慎選所吸收的。"},{"id":"011110","name":"大過","sym":"䷛","ci":"大過：棟橈，利有攸往，亨。","xiang":"澤滅木，大過；君子以獨立不懼，遯世無悶。","yao":["初六：藉用白茅，無咎。","九二：枯楊生稊，老夫得其女妻，無不利。","九三：棟橈，凶。","九四：棟隆，吉；有它吝。","九五：枯楊生華，老婦得士夫，無咎無譽。","上六：過涉滅頂，凶，無咎。"],"m":"負擔過重，需要非常的決斷，但別硬撐到底。"},{"id":"010010","name":"坎","sym":"䷜","ci":"坎：習坎，有孚，維心亨，行有尚。","xiang":"水洊至，習坎；君子以常德行，習教事。","yao":["初六：習坎，入於坎窞，凶。","九二：坎有險，求小得。","六三：來之坎坎，險且枕，入於坎窞，勿用。","六四：樽酒簋貳，用缶，納約自牖，終無咎。","九五：坎不盈，祗既平，無咎。","上六：系用徽纆，置於叢棘，三歲不得，凶。"],"m":"重重險阻，保持誠信與耐心，一步步渡過。"},{"id":"101101","name":"離","sym":"䷝","ci":"離：利貞，亨。畜牝牛，吉。","xiang":"明兩作離，大人以繼明照於四方。","yao":["初九：履錯然，敬之無咎。","六二：黃離，元吉。","九三：日昃之離，不鼓缶而歌，則大耋之嗟，凶。","九四：突如其來如，焚如，死如，棄如。","六五：出涕沱若，戚嗟若，吉。","上九：王用出征，有嘉折首，獲匪其醜，無咎。"],"m":"光明與依附，找到對的依靠，就能發光。"},{"id":"001110","name":"咸","sym":"䷞","ci":"咸，亨，利貞，取女吉。","xiang":"山上有澤，咸，君子以虛受人。","yao":["初六，咸其拇。","六二，咸其腓，凶，居吉。","九三，咸其股，執其隨，往吝。","九四，貞吉，悔亡，憧憧往來，朋從爾思。","九五，咸其脢，無悔。","上六，咸其輔頰舌。"],"m":"彼此感應、心意相通，真誠就能打動人。"},{"id":"011100","name":"恒","sym":"䷟","ci":"恒：亨，無咎，利貞，利有攸往。","xiang":"雷風，恒；君子以立不易方。","yao":["初六：浚恒，貞凶，無攸利。","九二：悔亡。","九三：不恒其德，或承之羞，貞吝。","九四：田無禽。","六五：恒其德，貞，婦人吉，夫子凶。","上六：振恒，凶。"],"m":"持之以恆，維持長久的關係與節奏最重要。"},{"id":"001111","name":"遯","sym":"䷠","ci":"遯：亨，小利貞。","xiang":"天下有山，遯；君子以遠小人，不惡而嚴。","yao":["初六：遯尾，厲，勿用有攸往。","六二：執之用黃牛之革，莫之勝說。","九三：系遯，有疾厲，畜臣妾吉。","九四：好遯，君子吉，小人否。","九五：嘉遯，貞吉。","上九：肥遯，無不利。"],"m":"適時退讓，避開鋒頭，保存實力。"},{"id":"111100","name":"大壯","sym":"䷡","ci":"大壯：利貞","xiang":"雷在天上，大壯；君子以非禮勿履。","yao":["初九：壯於趾，征凶，有孚。","九二：貞吉。","九三：小人用壯，君子用罔，貞厲。羝羊觸藩，羸其角。","九四：貞吉悔亡，藩決不羸，壯於大輿之輹。","六五：喪羊於易，無悔。","上六：羝羊觸藩，不能退，不能遂，無攸利，艱則吉。"],"m":"氣勢正盛，但盛極要守正，避免衝過頭。"},{"id":"000101","name":"晉","sym":"䷢","ci":"晉：康侯用錫馬蕃庶，晝日三接。","xiang":"明出地上，晉；君子以自昭明德。","yao":["初六：晉如，摧如，貞吉。罔孚，裕無咎。","六二：晉如，愁如，貞吉。受茲介福，於其王母。","六三：眾允，悔亡。","九四：晉如碩鼠，貞厲。","六五：悔亡，失得勿恤，往吉，無不利。","上九：晉其角，維用伐邑，厲吉無咎，貞吝。"],"m":"步步高升，表現會被看見，適合往前。"},{"id":"101000","name":"明夷","sym":"䷣","ci":"明夷：利艱貞。","xiang":"明入地中，明夷；君子以蒞眾，用晦而明。","yao":["初九：明夷於飛，垂其翼。君子於行，三日不食，有攸往，主人有言。","六二：明夷，夷於左股，用拯馬壯，吉。","九三：明夷於南狩，得其大首，不可疾貞。","六四：入於左腹，獲明夷之心，出於門庭。","六五：箕子之明夷，利貞。","上六：不明晦，初登於天，後入於地。"],"m":"光明受傷，暫時韜光養晦，保護自己。"},{"id":"101011","name":"家人","sym":"䷤","ci":"家人：利女貞。","xiang":"風自火出，家人；君子以言有物，而行有恒。","yao":["初九：閑有家，悔亡。","六二：無攸遂，在中饋，貞吉。","九三：家人嗃嗃，悔厲吉；婦子嘻嘻，終吝。","六四：富家，大吉。","九五：王假有家，勿恤，往吉。","上九：有孚威如，終吉。"],"m":"回到家庭與內部，各守其位，關係就穩。"},{"id":"110101","name":"睽","sym":"䷥","ci":"睽：小事吉。","xiang":"上火下澤，睽；君子以同而異。","yao":["初九：悔亡，喪馬勿逐，自復；見惡人無咎。","九二：遇主於巷，無咎。","六三：見輿曳，其牛掣，其人天且劓，無初有終。","九四：睽孤，遇元夫，交孚，厲無咎。","六五：悔亡，厥宗噬膚，往何咎。","上九：睽孤，見豕負塗，載鬼一車，先張之弧，後說之弧，匪寇婚媾，往遇雨則吉。"],"m":"意見相左、彼此疏離，求同存異才能化解。"},{"id":"001010","name":"蹇","sym":"䷦","ci":"蹇：利西南，不利東北；利見大人，貞吉。","xiang":"山上有水，蹇；君子以反身修德。","yao":["初六：往蹇，來譽。","六二：王臣蹇蹇，匪躬之故。","九三：往蹇來反。","六四：往蹇來連。","九五：大蹇朋來。","上六：往蹇來碩，吉；利見大人。"],"m":"前路艱難，停下來找幫手，比硬闖好。"},{"id":"010100","name":"解","sym":"䷧","ci":"解：利西南，無所往，其來復吉。有攸往，夙吉。","xiang":"雷雨作，解；君子以赦過宥罪。","yao":["初六：無咎。","九二：田獲三狐，得黃矢，貞吉。","六三：負且乘，致寇至，貞吝。","九四：解而拇，朋至斯孚。","六五：君子維有解，吉；有孚於小人。","上六：公用射隼於高墉之上，獲之，無不利。"],"m":"困難開始鬆動，問題得以化解，宜把握。"},{"id":"110001","name":"損","sym":"䷨","ci":"損：有孚，元吉，無咎，可貞，利有攸往。曷之用，二簋可用享。","xiang":"山下有澤，損；君子以懲忿窒欲。","yao":["初九：巳事遄往，無咎，酌損之。","九二：利貞，征凶，弗損，益之。","六三：三人行，則損一人；一人行，則得其友。","六四：損其疾，使遄有喜，無咎。","六五：或益之，十朋之龜弗克違，元吉。","上九：弗損益之，無咎，貞吉，有攸往，得臣無家。"],"m":"有捨才有得，先付出、減少不必要的，反而受益。"},{"id":"100011","name":"益","sym":"䷩","ci":"益：利有攸往，利涉大川。","xiang":"風雷，益；君子以見善則遷，有過則改。","yao":["初九：利用為大作，元吉，無咎。","六二：或益之，十朋之龜弗克違，永貞吉。王用享於帝，吉。","六三：益之用凶事，無咎。有孚中行，告公用圭。","六四：中行，告公從。利用為依遷國。","九五：有孚惠心，勿問元吉。有孚惠我德。","上九：莫益之，或擊之，立心勿恒，凶。"],"m":"增益之時，適合行動與投入，也記得助人。"},{"id":"111110","name":"夬","sym":"䷪","ci":"夬：揚於王庭，孚號，有厲，告自邑，不利即戎，利有攸往。","xiang":"澤上於天，夬；君子以施祿及下，居德則忌。","yao":["初九：壯於前趾，往不勝為咎。","九二：惕號，莫夜有戎，勿恤。","九三：壯於頄，有凶。君子夬夬，獨行，遇雨，若濡，有慍，無咎。   ","九四：臀無膚，其行次且。牽羊悔亡，聞言不信。","九五：莧陸夬夬，中行無咎。","上六：無號，終有凶。"],"m":"需要果斷做決定，把話說清楚，但別傷人。"},{"id":"011111","name":"姤","sym":"䷫","ci":"姤：女壯，勿用取女。","xiang":"天下有風，姤；後以施命誥四方。","yao":["初六：系於金柅，貞吉，有攸往，見凶，羸豕孚踟躅。","九二：包有魚，無咎，不利賓。","九三：臀無膚，其行次且，厲，無大咎。   ","九四：包無魚，起凶。","九五：以杞包瓜，含章，有隕自天。九五：以杞包瓜，含章，有隕自天。","上九：姤其角，吝，無咎。"],"m":"不期而遇，新的人事出現，要看清再投入。"},{"id":"000110","name":"萃","sym":"䷬","ci":"萃：亨。王假有廟，利見大人，亨，利貞。用大牲吉，利有攸往。","xiang":"澤上於地，萃；君子以除戎器，戒不虞。","yao":["初六：有孚不終，乃亂乃萃，若號一握為笑，勿恤，往無咎。","六二：引吉，無咎，孚乃利用禴。","六三：萃如，嗟如，無攸利，往無咎，小吝。   ","九四：大吉，無咎。","九五：萃有位，無咎。匪孚，元永貞，悔亡。","上六：賫咨涕洟，無咎。"],"m":"人氣與資源聚集，適合凝聚眾人、舉辦大事。"},{"id":"011000","name":"升","sym":"䷭","ci":"升：元亨，用見大人，勿恤，南征吉。","xiang":"地中生木，升；君子以順德，積小以高大。","yao":["初六：允升，大吉。","九二：孚乃利用禴，無咎。","九三：升虛邑。   ","六四：王用亨於岐山，吉無咎。","六五：貞吉，升階。","上六：冥升，利於不息之貞。"],"m":"穩步上升，循序漸進，貴人提攜。"},{"id":"010110","name":"困","sym":"䷮","ci":"困：亨，貞，大人吉，無咎，有言不信。","xiang":"澤無水，困；君子以致命遂誌。","yao":["初六：臀困於株木，入於幽谷，三歲不覿。","九二：困於酒食，朱紱方來，利用享祀，征凶，無咎。","六三：困於石，據於蒺藜，入於其宮，不見其妻，凶。   ","九四：來徐徐，困於金車，吝，有終。","九五：劓刖，困於赤紱，乃徐有說，利用祭祀。","上六：困於葛藟，於臲卼，曰動悔。有悔，征吉。"],"m":"處境受困，言多無益，守住信念等待轉機。"},{"id":"011010","name":"井","sym":"䷯","ci":"井：改邑不改井，無喪無得，往來井井。汔至，亦未繘井，羸其瓶，凶。","xiang":"木上有水，井；君子以勞民勸相。","yao":["初六：井泥不食，舊井無禽。","九二：井谷射鮒，甕敝漏。","九三：井渫不食，為我心惻，可用汲，王明，並受其福。   ","六四：井甃，無咎。","九五：井冽，寒泉食。","上六：井收勿幕，有孚元吉。"],"m":"資源穩定、取之不竭，重在維護與經營。"},{"id":"101110","name":"革","sym":"䷰","ci":"革：巳日乃孚，元亨利貞，悔亡。","xiang":"澤中有火，革；君子以治歷明時。","yao":["初九：鞏用黃牛之革。","六二：巳日乃革之，征吉，無咎。","九三：征凶，貞厲，革言三就，有孚。   ","九四：悔亡，有孚改命，吉。","九五：大人虎變，未占有孚。","上六：君子豹變，小人革面，征凶，居貞吉。"],"m":"變革的時機到了，準備好就勇敢改變。"},{"id":"011101","name":"鼎","sym":"䷱","ci":"鼎：元吉，亨。","xiang":"木上有火，鼎；君子以正位凝命。","yao":["初六：鼎顛趾，利出否，得妾以其子，無咎。","九二：鼎有實，我仇有疾，不我能即，吉。","九三：鼎耳革，其行塞，雉膏不食，方雨虧悔，終吉。   ","九四：鼎折足，覆公餗，其形渥，凶。","六五：鼎黃耳，金鉉，利貞。","上九：鼎玉鉉，大吉，無不利。"],"m":"除舊佈新、建立新局，適合承擔重任。"},{"id":"100100","name":"震","sym":"䷲","ci":"震：亨。震來虩虩，笑言啞啞。震驚百裏，不喪匕鬯。","xiang":"虩雷，震；君子以恐懼修身。","yao":["初九：震來虩虩，後笑言啞啞，吉。","六二：震來厲，億喪貝，躋於九陵，勿逐，七日得。","六三：震蘇蘇，震行無眚。   ","九四：震遂泥。","六五：震往來厲，億無喪，有事。","上六：震索索，視矍矍，征凶。震不於其躬，於其鄰，無咎。婚媾有言。"],"m":"突如其來的震動，驚過之後反而更清醒。"},{"id":"001001","name":"艮","sym":"䷳","ci":"艮：艮其背，不獲其身，行其庭，不見其人，無咎。","xiang":"兼山，艮；君子以思不出其位。","yao":["初六：艮其趾，無咎，利永貞。","六二：艮其腓，不拯其隨，其心不快。","九三：艮其限，列其夤，厲薰心。","六四：艮其身，無咎。","六五：艮其輔，言有序，悔亡。","上九：敦艮，吉。"],"m":"該停就停，靜下來，不要勉強前進。"},{"id":"001011","name":"漸","sym":"䷴","ci":"漸：女歸吉，利貞。","xiang":"山上有木，漸；君子以居賢德，善俗。","yao":["初六：鴻漸于干，小子厲，有言，無咎。","六二：鴻漸於磐，飲食衎衎，吉。","九三：鴻漸於陸，夫征不復，婦孕不育，凶；利禦寇。","六四：鴻漸於木，或得其桷，無咎。","九五：鴻漸於陵，婦三歲不孕，終莫之勝，吉。","上九：鴻漸於陸，其羽可用為儀，吉。"],"m":"循序漸進，慢慢來反而最穩。"},{"id":"110100","name":"歸妹","sym":"䷵","ci":"歸妹：征凶，無攸利。","xiang":"澤上有雷，歸妹；君子以永終知敝。","yao":["初九：歸妹以娣，跛能履，征吉。","九二：眇能視，利幽人之貞。","六三：歸妹以須，反歸以娣。","九四：歸妹愆期，遲歸有時。","六五：帝乙歸妹，其君之袂，不如其娣之袂良，月幾望，吉。","上六：女承筐無實，士刲羊無血，無攸利。"],"m":"名分與時機需留意，不宜強求，先看清關係。"},{"id":"101100","name":"豐","sym":"䷶","ci":"豐：亨，王假之，勿憂，宜日中。","xiang":"雷電皆至，豐；君子以折獄致刑。","yao":["初九：遇其配主，雖旬無咎，往有尚。","六二：豐其蔀，日中見鬥，往得疑疾，有孚發若，吉。","九三：豐其沛，日中見沫，折其右肱，無咎。","九四：豐其蔀，日中見鬥，遇其夷主，吉。","六五：來章，有慶譽，吉。","上六：豐其屋，蔀其家，闚其戶，闃其無人，三歲不覿，凶。"],"m":"盛大豐滿之時，把握當下，也預備轉變。"},{"id":"001101","name":"旅","sym":"䷷","ci":"旅：小亨，旅貞吉。","xiang":"山上有火，旅；君子以明慎用刑，而不留獄。","yao":["初六：旅瑣瑣，斯其所取災。","六二：旅即次，懷其資，得童仆貞。","九三：旅焚其次，喪其童仆，貞厲。","九四：旅於處，得其資斧，我心不快。","六五：射雉一矢亡，終以譽命。","上九：鳥焚其巢，旅人先笑後號啕。喪牛於易，凶。"],"m":"在外漂泊、處於過渡，謹慎低調，守住本分。"},{"id":"011011","name":"巽","sym":"䷸","ci":"巽：小亨，利攸往，利見大人。","xiang":"隨風，巽；君子以申命行事。","yao":["初六：進退，利武人之貞。","九二：巽在床下，用史巫紛若，吉，無咎。","九三：頻巽，吝。","六四：悔亡，田獲三品。","九五：貞吉悔亡，無不利。無初有終，先庚三日，後庚三日，吉。","上九：巽在床下，喪其資斧，貞凶。"],"m":"柔順而入，用溝通與彈性慢慢推進。"},{"id":"110110","name":"兌","sym":"䷹","ci":"兌：亨，利貞。","xiang":"麗澤，兌；君子以朋友講習。","yao":["初九：和兌，吉。","九二：孚兌，吉，悔亡。","六三：來兌，凶。","九四：商兌，未寧，介疾有喜。","九五：孚於剝，有厲。","上六：引兌。"],"m":"喜悅與交流，真誠的言語能帶來好結果。"},{"id":"010011","name":"渙","sym":"䷺","ci":"渙：亨。王假有廟，利涉大川，利貞。","xiang":"風行水上，渙；先王以享於帝立廟。","yao":["初六：用拯馬壯，吉。","九二：渙奔其機，悔亡。","六三：渙其躬，無悔。","六四：渙其群，元吉。渙有丘，匪夷所思。","九五：渙汗其大號，渙王居，無咎。","上九：渙其血，去逖出，無咎。"],"m":"人心與局面渙散，需要重新凝聚。"},{"id":"110010","name":"節","sym":"䷻","ci":"節：亨。苦節，不可貞。","xiang":"澤上有水，節；君子以制數度，議德行。","yao":["初九：不出戶庭，無咎。","九二：不出門庭，凶。","六三：不節若，則嗟若，無咎。","六四：安節，亨。","九五：甘節，吉；往有尚。","上六：苦節，貞凶，悔亡。"],"m":"適度節制，訂好界線，過與不及都不好。"},{"id":"110011","name":"中孚","sym":"䷼","ci":"中孚：豚魚吉，利涉大川，利貞。","xiang":"澤上有風，中孚；君子以議獄緩死。","yao":["初九：虞吉，有它不燕。","九二：鳴鶴在陰，其子和之，我有好爵，吾與爾靡之。","六三：得敵，或鼓或罷，或泣或歌。","六四：月幾望，馬匹亡，無咎。","九五：有孚攣如，無咎。","上九：翰音登於天，貞凶。"],"m":"誠信為本，真心能感動人，也能過難關。"},{"id":"001100","name":"小過","sym":"䷽","ci":"小過：亨，利貞，可小事，不可大事。飛鳥遺之音，不宜上，宜下，大吉。","xiang":"山上有雷，小過；君子以行過乎恭，喪過乎哀，用過乎儉。","yao":["初六：飛鳥以凶。","六二：過其祖，遇其妣；不及其君，遇其臣；無咎。","九三：弗過防之，從或戕之，凶。","九四：無咎，弗過遇之。往厲必戒，勿用永貞。","六五：密雲不雨，自我西郊，公弋取彼在穴。","上六：弗遇過之，飛鳥離之，凶，是謂災眚。"],"m":"小事可為、大事宜緩，低調行事。"},{"id":"101010","name":"既濟","sym":"䷾","ci":"既濟：亨，小利貞，初吉終亂。","xiang":"水在火上，既濟；君子以思患而預防之。","yao":["初九：曳其輪，濡其尾，無咎。","六二：婦喪其茀，勿逐，七日得。","九三：高宗伐鬼方，三年克之，小人勿用。","六四：繻有衣袽，終日戒。","九五：東鄰殺牛，不如西鄰之禴祭，實受其福。","上六：濡其首，厲。"],"m":"事情已經完成，但要居安思危，防止轉壞。"},{"id":"010101","name":"未濟","sym":"䷿","ci":"未濟：亨，小狐汔濟，濡其尾，無攸利。","xiang":"火在水上，未濟；君子以慎辨物居方。","yao":["初六：濡其尾，吝。","九二：曳其輪，貞吉。","六三：未濟，征凶，利涉大川。","九四：貞吉，悔亡，震用伐鬼方，三年有賞於大國。","六五：貞吉，無悔，君子之光，有孚，吉。","上九：有孚於飲酒，無咎，濡其首，有孚失是。"],"m":"還沒完成，接近終點更要謹慎，仍有可為。"}];const GBY={};GUA.forEach(g=>GBY[g.id]=g);
+const YPOS=["初爻","二爻","三爻","四爻","五爻","上爻"];
+const VAL={6:"老陰",7:"少陽",8:"少陰",9:"老陽"};
+const CATS=[["感情","love"],["工作","work"],["考試・學業","exam"],["錢與財務","money"],["合夥・合作","partner"],["搬家・搬遷","move"],["家人・人際","people"],["其他","other"]];
+const CAT_EG={love:"我和他還有機會在一起嗎？",work:"這份工作，我該不該留下來？",exam:"今年的國考，我考得上嗎？",money:"這筆錢該借給朋友嗎？",partner:"要不要和朋友合夥開店？",move:"明年搬去台中適合嗎？",people:"我該怎麼跟家人說這件事？",other:"這件事，我該往前還是先等等？"};
+const GUARD=[[/(樂透|彩券|威力彩|大樂透|今彩|明牌|號碼|股票|個股|期貨|加密貨幣|虛擬貨幣|比特幣|賭)/,"不替人選號碼或投資標的。換一件事問我吧。"],
+  [/(死|過世|往生|壽命|活多久|癌|病|手術|開刀|療效|治療|吃藥)/,"身體與生死的事，請交給醫生。換一件事問我吧。"]];
+const LEGAL=/(官司|訴訟|判決|法院|賠償|告他|告她|被告|提告|仲裁)/;
+function guaCheck(v,book){if(v.length<4)return"再多寫幾個字，讓我知道你在問什麼";if(v.length>60)return"請在 60 個字以內，只問一件事";
+  if((v.match(/[？?]/g)||[]).length>1)return book?"一次只問一件事，其他的可以之後再追問":"一次只問一件事，其他的下一卦再問";
+  for(const [re,msg] of GUARD)if(re.test(v))return msg;return""}
+/* 三枚錢：字＝2、背＝3；6 老陰、7 少陽、8 少陰、9 老陽 */
+function rnd(){const a=new Uint32Array(1);crypto.getRandomValues(a);return a[0]/4294967296}
+function toss(){return[0,1,2].map(()=>rnd()<.5?3:2)}
+function hexOf(lines){const ben=lines.map(v=>v%2?"1":"0").join("");const chg=lines.map((v,i)=>v===6||v===9?i:-1).filter(i=>i>=0);
+  const zhi=lines.map((v,i)=>{const y=v%2;return String(chg.includes(i)?1-y:y)}).join("");return{ben,zhi,chg}}
+const yn=s=>s.split(/[：，、]/)[0];
+/* 朱熹《易學啟蒙》占法 */
+function guaRule(lines){const {ben,zhi,chg}=hexOf(lines);const B=GBY[ben],Z=GBY[zhi],n=chg.length;
+  const still=[0,1,2,3,4,5].filter(i=>!chg.includes(i));let r;
+  if(n===0)r={main:B,text:[B.ci],label:"沒有變爻，看本卦的卦辭"};
+  else if(n===1)r={main:B,text:[B.yao[chg[0]]],label:`一個變爻，看本卦「${yn(B.yao[chg[0]])}」的爻辭`};
+  else if(n===2){const u=chg[1];r={main:B,text:[B.yao[u]],label:`兩個變爻，以上面那一爻為主，看「${yn(B.yao[u])}」`}}
+  else if(n===3)r={main:B,text:[B.ci,Z.ci],label:`三個變爻，合看本卦與之卦的卦辭，以本卦為主`};
+  else if(n===4){const l=still[0];r={main:Z,text:[Z.yao[l]],label:`四個變爻，看之卦裡不變的下一爻「${yn(Z.yao[l])}」`}}
+  else if(n===5)r={main:Z,text:[Z.yao[still[0]]],label:`五個變爻，看之卦唯一不變的「${yn(Z.yao[still[0]])}」`};
+  else if(B.yao[6])r={main:B,text:[B.yao[6]],label:`六爻全變，${B.name}卦看「${yn(B.yao[6])}」`};
+  else r={main:Z,text:[Z.ci],label:"六爻全變，看之卦的卦辭"};
+  return{...r,B,Z:n?Z:null,chg,ben,zhi}}
+const GUA_LOCK={love:"這一卦落在你們之間，關鍵不在對方怎麼想，而在你接下來那一步要不要先跨出去；變爻提醒的時間點，會落在",
+  work:"這一卦落在你的工作上，眼前卡住的地方其實已經在鬆動，真正要小心的是你太快答應的那件事；適合動的時機，會落在",
+  money:"這一卦落在錢的事上，重點不是賺多少，而是一個你一直沒正視的出口；卦裡提醒你守住的，是",
+  people:"這一卦落在人與人之間，問題的源頭不在你身上，但化解的那一步，得由你先開口；最適合談開的時候，是",
+  exam:"這一卦落在考試上，你缺的不是時間，而是一個你一直在逃避的科目；卦裡提醒最需要衝刺的時候，是",
+  partner:"這一卦落在合作上，真正的風險不在對方的能力，而在你們一開始就沒說清楚的那件事；卦裡要你先談好的，是",
+  move:"這一卦落在搬遷上，該不該動，關鍵不在新的地方好不好，而在你想離開的是什麼；卦裡說適合動身的時間與方位，是",
+  other:"這一卦落在這件事上，眼前看似停滯，其實底下正在慢慢轉動；卦裡要你留意的，是"};
+let gEl=null;
+function guaBoard(){if(gEl)return gEl;gEl=document.createElement("div");gEl.className="gua";gEl.id="gua";gEl.setAttribute("aria-live","polite");
+  gEl.innerHTML=`<div class="coins">${[0,1,2].map(()=>`<i class="coin"><b><s>通</s><s>寶</s></b></i>`).join("")}</div><p class="gval" id="gval"></p><div class="hex" id="hex"></div><div class="gname" id="gname"></div>`;
+  rt.appendChild(gEl);return gEl}
+function guaReset(){if(!gEl)return;gEl.classList.remove("on","done","away");$("hex").innerHTML="";$("gval").textContent="";$("gname").innerHTML="";gEl.querySelectorAll(".coin").forEach(c=>c.className="coin")}
+async function flip(face){const cs=[...gEl.querySelectorAll(".coin")];cs.forEach(c=>{c.className="coin spin"});Snd.chime(2349.3,.02,.6);
+  await wait(reduce?50:1000);cs.forEach((c,i)=>{c.className="coin "+(face[i]===3?"bei":"zi")});Snd.chime(1046.5,.03,1.2)}
+function addLine(i,v){const d=document.createElement("div");d.className="ln "+(v%2?"yang":"yin")+(v===6||v===9?" chg":"");
+  d.innerHTML=`<small>${YPOS[i]}</small><span class="bar"><i></i><i></i></span><em>${v===9?"○":v===6?"×":""}</em>`;$("hex").appendChild(d);requestAnimationFrame(()=>requestAnimationFrame(()=>d.classList.add("on")))}
+async function guaFlow(t){
+  shot("close");
+  await say("想問哪一方面的事？",t);if(t!==token)return;
+  const c=await chips(CATS.map(([l,v])=>({label:l,v})));if(t!==token)return;said(c.label);S.cat=c.v;
+  await say("把想問的事寫下來。一次只問一件，寫得越具體越好。",t);if(t!==token)return;
+  const q=await field("text","例如："+(CAT_EG[S.cat]||CAT_EG.other),guaCheck);if(t!==token)return;
+  S.q=q;S.legal=LEGAL.test(q);said(q);track("gua_question",{cat:S.cat,len:q.length,legal:S.legal});
+  if(S.legal){await say("卦不判輸贏，也不算金額。我替你看的，是這件事的時機，和你能怎麼做。",t);if(t!==token)return}
+  shot("toss");said("");
+  await say("雙手合起，心裡默念這件事。準備好了，就擲。",t);if(t!==token)return;
+  guaBoard();guaReset();requestAnimationFrame(()=>gEl.classList.add("on"));
+  const lines=[];
+  for(let i=0;i<6;i++){
+    await chips([{label:i===0?"擲第一次":`擲第 ${i+1} 次`,cls:"main"}]);if(t!==token)return;
+    const f=toss(),v=f.reduce((a,b)=>a+b,0);await flip(f);if(t!==token)return;
+    lines.push(v);addLine(i,v);$("gval").textContent=`${YPOS[i]}・${f.filter(x=>x===3).length} 背 ${f.filter(x=>x===2).length} 字・${VAL[v]}`;track("gua_toss",{i,v});
+    if(i<5)line.textContent=i===2?"下卦成了。再三次。":"";
+  }
+  S.lines=lines.slice();const R=S.G=guaRule(lines);track("gua_done",{ben:R.B.name,zhi:R.Z&&R.Z.name,chg:R.chg.length});
+  await wait(500);gEl.classList.add("done");
+  $("gname").innerHTML=`<span><b>${R.B.sym}</b>${R.B.name}</span>`+(R.Z?`<i>→</i><span><b>${R.Z.sym}</b>${R.Z.name}</span>`:"");
+  Snd.gong();rt.classList.add("dim");shot("read");
+  await say(R.Z?`本卦是「${R.B.name}」，變成「${R.Z.name}」。`:`這一卦，是「${R.B.name}」，沒有變爻。`,t,{tap:true});if(t!==token)return;
+  await say(`依朱熹的讀法，${R.label}：`,t);if(t!==token)return;
+  await say(R.text.join("　"),t,{tap:true,long:true});if(t!==token)return;
+  gEl.classList.add("away");rt.classList.remove("dim");shot("face");setTopic(`${R.main.name}・白話`);
+  await say(`白話來說：${R.main.m}`,t,{tap:true,long:true});if(t!==token)return;
+  setTopic("落到你問的事上");shot("hush");
+  await say(`就你問的「${S.q}」……`,t,{tap:true,long:true,veiled:GUA_LOCK[S.cat]+"……"});if(t!==token)return;
+  setTopic("");Snd.gong();track("paywall_view",{product:"gua"});
+  await say("這一卦怎麼落到你的事上，要細細說給你聽。",t);if(t!==token)return;
+  openGua(t);
+}
+function openGua(t){
+  const bk=$("book"),R=S.G;let plan="gua1";
+  bk.innerHTML=`<div class="book-in">
+    <div><p class="kick">為你問的這件事</p><h2>夜燈・周易解卦</h2><p class="meta">「${esc(S.q)}」</p></div>
+    <section><h3>你擲出的卦</h3><div class="gcard"><div class="gpair"><span><b>${R.B.sym}</b>${R.B.name}</span>${R.Z?`<i>→</i><span><b>${R.Z.sym}</b>${R.Z.name}</span>`:""}</div><p class="gtxt">${esc(R.text.join("　"))}</p><small>${esc(R.label)}</small></div></section>
+    <section><h3>解卦裡會寫的</h3><ol class="toc">
+      <li><b>一</b><div>卦象與你此刻的處境<small>本卦的意思，放到你問的事上</small></div></li>
+      <li><b>二</b><div>這件事接下來的走向<small>${R.Z?`從${R.B.name}到${R.Z.name}，變在哪裡`:"沒有變爻，代表局面會維持多久"}</small></div></li>
+      <li><b>三</b><div>變爻在提醒你什麼<small>${R.chg.length?`${R.chg.length} 個變爻，逐一說明`:"卦辭裡的關鍵字"}</small></div></li>
+      <li><b>四</b><div>你可以怎麼做<small>三件具體的事</small></div></li>
+      <li><b>五</b><div>可以留意的時間<small>月份範圍・僅供參考</small></div></li></ol></section>
+    <section><h3>怎麼解</h3><div class="plans">
+      <label class="plan-opt"><input type="radio" name="gplan" value="gua1" checked><div><span>解這一卦</span><small>約 1,500 字・寄到你的 Email</small></div><em>${nt(PRICE.gua1)}</em></label>
+      <label class="plan-opt"><input type="radio" name="gplan" value="gua3"><div><span>三件事一起問</span><small>解這一卦＋再問兩卦・30 天內使用・省 ${nt(PRICE.gua1*3-PRICE.gua3)}</small></div><em>${nt(PRICE.gua3)}</em></label>
+    </div></section>
+    <label class="mail">寄送解卦的 Email<input id="bk-mail" type="email" autocomplete="email" placeholder="you@example.com" value="${esc(S.email||"")}"></label>
+    <div class="plans"><label class="check"><input type="checkbox" id="bk-ok"><span>我了解解卦是依我擲出的卦即時產生的數位內容，開通後無法退款，並同意<a href="terms.html" target="_blank" rel="noopener">服務條款</a>、<a href="privacy.html" target="_blank" rel="noopener">隱私權政策</a>與<a href="refund.html" target="_blank" rel="noopener">退款政策</a>。</span></label></div>
+    <section class="faq"><h3>常見問題</h3>
+      <details><summary>同一件事可以一直重擲嗎？</summary><p>古人說「初筮告，再三瀆」。同一件事一個月內只解第一卦，重擲的卦不另外解。</p></details>
+      <details><summary>卦會告訴我結果嗎？</summary><p>卦看的是趨勢、時機與你能怎麼做，不判斷官司輸贏、金額、病情或投資標的。</p></details>
+      <details><summary>經文從哪裡來？</summary><p>卦辭、爻辭為《周易》原文；解讀依朱熹《易學啟蒙》的占法。</p></details></section>
+    <p class="fine">解卦依《周易》傳統讀法，僅供參考與娛樂。</p>
+  </div>
+  <div class="book-bar"><p class="err" id="bk-err" role="alert"></p><button type="button" class="paybtn" id="bk-pay"></button><button type="button" class="later" id="bk-later">再想想</button></div>
+  <button type="button" class="book-x" id="bk-x" aria-label="關閉">×</button>`;
+  const pay=$("bk-pay"),err=$("bk-err");const upd=()=>pay.textContent=`解卦　${nt(PRICE[plan])}`;upd();
+  bk.addEventListener("change",()=>err.textContent="");
+  bk.querySelectorAll('input[name="gplan"]').forEach(i=>i.onchange=()=>{plan=i.value;upd();track("plan_select",{plan})});
+  bk.hidden=false;requestAnimationFrame(()=>requestAnimationFrame(()=>bk.classList.add("on")));
+  const later=async()=>{track("paywall_later",{product:"gua"});closeBook();shot("face");said("");await say("這一卦我替你記著。想好了再來找我。",t);if(t!==token)return;
+    const o=await chips([{label:"再看一次",cls:"main",v:"book"},{label:"回到開頭",v:"again"}]);if(t!==token)return;o.v==="book"?(shot("hush"),openGua(t)):open()};
+  $("bk-later").onclick=later;$("bk-x").onclick=later;
+  pay.onclick=async()=>{if(pay.getAttribute("aria-disabled")==="true")return;const mail=$("bk-mail").value.trim();
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)){err.textContent="請留下正確的 Email，解卦會寄到這裡";$("bk-mail").focus();return}
+    if(!$("bk-ok").checked){err.textContent="請先勾選同意數位內容條款";return}
+    S.email=mail;track("plan_click",{product:"gua",plan,value:PRICE[plan]});
+    pay.setAttribute("aria-disabled","true");pay.textContent="正在前往付款…";
+    try{await YD.checkout({items:[plan],email:mail,price_group:PRICE.group,gua:{question:S.q,category:S.cat,lines:S.lines},
+        agree:true,newsletter:false,utm:utm()});track("checkout_redirect",{product:"gua",value:PRICE[plan]})}
+    catch(e){err.textContent=e.message||"建立訂單失敗，請稍後再試";pay.removeAttribute("aria-disabled");upd()}};
+}
+
+/* ---------------- 問事流程 ---------------- */
+async function dialogue(preset){
+  const t=++token;$("rt-box").hidden=false;said("");setTopic("");
+  shot("face");
+  if(!preset){await say("你來了。燈還亮著，先坐下吧。",t);
+  await say("今夜，你想問的是什麼？",t);if(t!==token)return}
+  const m=preset?{label:"我這個人",v:preset}:await chips([{html:"我這個人<small>紫微命盤・個性、工作、感情</small>",label:"我這個人",v:"base",cls:"big"},{html:"明年的運<small>2027 丁未流年</small>",label:"明年的運",v:"year",cls:"big"},{html:"我和某個人<small>雙人合盤・緣分與相處</small>",label:"我和某個人",v:"pair",cls:"big"},{html:"心裡有一件事<small>周易問卦・一事一卦</small>",label:"心裡有一件事",v:"gua",cls:"big"}]);if(t!==token)return;
+  said(m.label);S.mode=m.v;track("mode_select");
+  if(S.mode==="gua")return guaFlow(t);
+  shot("close");
+  await say("在看你的星之前，我該怎麼稱呼你？",t);if(t!==token)return;
+  const who=await whoForm("你的名字或暱稱",[["我是女生","女"],["我是男生","男"]]);if(t!==token)return;
+  S.name=who.name;S.sex=who.sex;said(`${who.name}・${who.sex}`);track("step_name");
+  shot("hand");
+  await say(`${S.name}，你是哪一天來到這個世界的？`,t);if(t!==token)return;
+  S.dob=await dobForm({y:1994,m:8,d:17,k:"me"});if(t!==token)return;said(fmtDob(S.dob));track("step_birth",{calendar:S.dob.cal});
+  const pre=window.iztro?computeChart(S.dob,6,S.sex):null;
+  if(pre&&!pre.demo){const yg=pre.gz.split(" ")[0];await say(`${yg}年，屬${pre.zodiac}。`,t)}
+  const h=await askHour(t,"那一刻，大約是什麼時辰？不確定也沒關係。");if(!h||t!==token)return;S.hour=h.v;S.hourIdx=h.i;track("step_hour",{unknown:!!h.unknown});
+  if(h.unknown)await say("沒關係，我先用午時替你推算。時辰會影響命宮，之後可以再改。",t);
+  if(S.mode!=="pair"){
+    shot("mid");
+    await say("現在，身邊有人嗎？",t);if(t!==token)return;
+    const r=await chips(REL.map(([l,v])=>({label:l,v})));if(t!==token)return;said(r.label);S.rel=r.v;track("step_rel",{rel:r.v});
+    if(S.mode==="base"&&(r.v==="single"||r.v==="crush")){await say("你會心動的，是男生還是女生？",t);if(t!==token)return;
+      const lk=await chips([{label:"男生",v:"男"},{label:"女生",v:"女"}]);if(t!==token)return;said(lk.label);S.like=lk.v;track("step_like",{like:lk.v})}
+    if(S.mode==="base"&&(r.v==="married"||r.v==="dating")){await say("家裡，有小孩了嗎？",t);if(t!==token)return;
+      const kd=await chips([{label:"有了",v:"have"},{label:"還沒，想要",v:"want"},{label:"還沒，先不考慮",v:"notyet"},{label:"不想說",v:"skip"}]);if(t!==token)return;said(kd.label);S.kids=kd.v;track("step_kids",{kids:kd.v})}
+  }
+  await say(S.mode==="pair"?"你最近，都在忙什麼？":"那你最近，都在忙什麼？",t);if(t!==token)return;
+  const j=await chips(JOBS.map(([l,v])=>({label:l,v})));if(t!==token)return;said(j.label);S.job=j.v;track("step_job",{job:j.v});
+  S.C=computeChart(S.dob,S.hourIdx,S.sex);
+  let closing="好。你的十二宮，我現在替你一一點亮。";
+  if(S.mode==="pair"){
+    shot("wide");
+    await say("這次你想問的，是和誰之間的緣分？",t);if(t!==token)return;
+    const pw=await whoForm("對方的名字",[["對方是女生","女"],["對方是男生","男"]]);if(t!==token)return;S.pname=pw.name;S.psex=pw.sex;said(`${pw.name}・${pw.sex}`);
+    shot("hand");
+    await say(`${S.pname}，是哪一天出生的？`,t);if(t!==token)return;
+    S.pdob=await dobForm({y:1992,m:3,d:5,k:"other"});if(t!==token)return;said(fmtDob(S.pdob));
+    const ph=await askHour(t,`${S.pname}是什麼時辰出生的？`);if(!ph||t!==token)return;S.phour=ph.v;
+    S.C2=computeChart(S.pdob,ph.i,S.psex);track("step_partner");
+    closing=`${S.name}和${S.pname}……兩條線，我看見它們交會的地方了。`;
+  }else if(S.mode==="year")closing="2027 是丁未年。我替你看看，明年的風往哪裡吹。";
+  shot("close");said("");
+  await say(closing,t);if(t!==token)return;
+  await chips([{label:S.mode==="pair"?"開始合盤":"開始排盤",cls:"main"}]);if(t!==token)return;
+  track("cast_start");
+  await transition(t);if(t!==token)return;
+  await cast(t);if(t!==token)return;
+  track("chart_done");
+  await keep(t);if(t!==token)return;
+  await reading(t);
+}
+async function transition(t){
+  said("");line.textContent="";$("rt-box").hidden=true;scatter();Snd.sweep();
+  const used=shot("cast");
+  if(used==="cast"){const v=clips.cast;await new Promise(r=>{let d=false;const done=()=>{if(!d){d=true;r()}};v.addEventListener("ended",done,{once:true});setTimeout(done,((v.duration||5)+.4)*1000)})}
+  else await wait(2200);
+  if(t!==token)return;
+  shot("read");rt.classList.add("dim");
+  await wait(600);
+}
+function open(){
+  token++;for(const k in S)delete S[k];rt.classList.remove("lit","dim","reading");chart.classList.remove("on","away","read");slips.innerHTML="";
+  line.textContent="";reply.innerHTML="";said("");setTopic("");$("pin").hidden=true;$("book").classList.remove("on");$("book").hidden=true;
+  guaReset();{const me=$("mate");if(me)me.classList.remove("on")}$("rt-intro").classList.remove("out");$("rt-box").hidden=true;shot("wide");startFx();
+  requestAnimationFrame(()=>requestAnimationFrame(()=>rt.classList.add("lit")));
+  $("rt-enter").onclick=()=>{Snd.start();Snd.chime(1046.5,.06,3);$("snd").hidden=false;track("enter");$("rt-intro").classList.add("out");setTimeout(dialogue,reduce?0:700)};
+}
+track("landing");
+open();
+})();
+
+</script>
+
+</body></html>
