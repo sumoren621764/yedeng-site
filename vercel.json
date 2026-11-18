@@ -1,1 +1,1 @@
-{"rewrites": [{"source": "/products.html", "destination": "/index.html"}], "headers": [{"source": "/v/(.*)", "headers": [{"key": "Cache-Control", "value": "public, max-age=604800, immutable"}]}]}
+{"rewrites": [{"source": "/products.html", "destination": "/index.html"}, {"source": "/links", "destination": "/links.html"}], "headers": [{"source": "/v/(.*)", "headers": [{"key": "Cache-Control", "value": "public, max-age=604800, immutable"}]}]}
