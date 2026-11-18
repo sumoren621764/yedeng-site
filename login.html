@@ -24,7 +24,8 @@
 
 <figure class="scene"><img src="img/lamp.webp" alt="提燈的引路人" width="1280" height="850" decoding="async" fetchpriority="high"></figure>
 <div class="doc-head"><h1>點燈入內</h1><p class="lead">登入後可以重看買過的命書、使用追問、保存常用生辰。不登入也能購買，用同一個 Email 登入後，舊訂單會自動出現。</p></div>
-<section class="panel" aria-labelledby="h-login">
+<section class="panel" id="p-wait" hidden><p class="msg" style="margin:0;font-size:1rem"><span class="spin"></span>　正在幫你點燈，馬上就好…</p></section>
+<section class="panel" id="p-login" aria-labelledby="h-login">
 <h2 id="h-login">用 Email 登入</h2>
 <form id="f-email" class="stack" novalidate>
 <div class="field"><label for="email">Email</label><input id="email" type="email" inputmode="email" autocomplete="email" required placeholder="you@example.com"></div>
@@ -65,8 +66,12 @@
   $("#b-line").href=YD.cfg.api+"/auth/line/start?next="+encodeURIComponent(next);
   function done(){location.replace(next);}
   // 已經登入就直接過去；從 Email 連結或 Google 回來時，把登入換成本站 session
-  function tryExchange(){YD.exchange(ex).then(function(ok){if(ok)done();}).catch(function(e){m.className="msg bad";m.textContent=e.message;});}
-  if(bind) tryExchange(); else YD.api("/me").then(done,tryExchange);
+  // 從 Google 或 Email 連結回來時，網址會帶 code；先顯示「登入中」，直接換 session，不再等 /me
+  var back_=/[?&]code=|access_token=/.test(location.search+location.hash);
+  function waiting(on){$("#p-wait").hidden=!on;$("#p-login").hidden=on;}
+  function tryExchange(){YD.exchange(ex).then(function(ok){if(ok)done();else waiting(false);}).catch(function(e){waiting(false);m.className="msg bad";m.textContent=e.message;});}
+  if(back_){waiting(true);tryExchange();}
+  else if(bind) tryExchange(); else YD.api("/me").then(done,tryExchange);
   var email="";
   $("#f-email").addEventListener("submit",function(ev){
     ev.preventDefault(); email=$("#email").value.trim().toLowerCase();
