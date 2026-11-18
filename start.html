@@ -255,6 +255,7 @@ img,svg,video,canvas{-webkit-user-drag:none}
 
 .mail textarea{background:rgba(5,7,13,.6);border:0;border-bottom:1px solid var(--gold-dim);color:var(--fg);padding:9px 4px;font-size:1rem;letter-spacing:0;font-family:var(--sans);resize:none;line-height:1.5}
 .mail textarea:focus{outline:none;border-bottom-color:var(--gold)}
+.promo{display:inline-block;font-family:var(--sans);font-size:.62rem;font-weight:700;letter-spacing:.08em;color:var(--night);background:var(--cinnabar);padding:1px 6px;border-radius:2px;margin-right:6px;vertical-align:2px}.plan-opt:has(input:checked) .promo{background:var(--cinnabar)}.was{color:var(--mute);font-weight:400;font-size:.8em;margin-right:6px}.cpn{display:flex;flex-direction:column;gap:4px}.cpn-row{display:flex;gap:8px}.cpn-row input{flex:1;min-width:0;background:rgba(5,7,13,.6);border:0;border-bottom:1px solid var(--gold-dim);color:var(--fg);padding:9px 4px;font-size:1rem;font-family:var(--sans);text-transform:uppercase}.cpn-row input:focus{outline:none;border-bottom-color:var(--gold)}.cpn-row .chip{flex:none;padding:6px 14px}
 .book .hint{margin:6px 0 0;font-size:.72rem;color:var(--mute);line-height:1.6}
 </style>
 
@@ -310,7 +311,18 @@ function track(event,props={}){const e={event,mode:S.mode||null,price_group:PRIC
 
 /* ---------------- 價格分組 A/B ---------------- */
 const GROUPS={a:{std:490,vip:990,add:290,ask1:290,ask3:690,gua1:99,gua3:249},b:{std:1280,vip:1980,add:650,ask1:390,ask3:890,gua1:199,gua3:490}};
-const PRICE={group:"a",...GROUPS.a};  /* 目前固定 A 組，與商品頁價格一致 */
+const PRICE={group:"a",...GROUPS.a,ystd:490,yvip:990},PROMO={},LIST={};  /* 先用預設值，載入後以後端 /products 為準 */
+try{YD.api("/products").then(d=>{(d.items||[]).forEach(i=>{PRICE[i.code]=i.price;PROMO[i.code]=i.promo_label||"";LIST[i.code]=i.list_price||0})}).catch(()=>{})}catch(_){}
+const pc=p=>S.mode==="year"?(p==="vip"?"yvip":"ystd"):p;
+const ptag=c=>(PROMO[c]?`<small class="promo">${esc(PROMO[c])}</small>`:"")+(LIST[c]>PRICE[c]?`<s class="was">${nt(LIST[c])}</s>`:"")+nt(PRICE[c]);
+/* 優惠碼欄位：試算只是預覽，實際以建立訂單時的檢查為準 */
+const cpnHtml=()=>`<div class="cpn"><label class="mail" for="bk-cpn">優惠碼（選填）</label><div class="cpn-row"><input id="bk-cpn" maxlength="32" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="有優惠碼就填這裡"><button type="button" class="chip" id="bk-cpn-go">套用</button></div><p class="hint" id="bk-cpn-msg" role="status"></p></div>`;
+function cpnBind(items,onChange){let cur=null;const inp=$("bk-cpn"),msg=$("bk-cpn-msg"),go=$("bk-cpn-go");
+  const run=code=>{if(!code){cur=null;msg.textContent="";onChange(null);return}go.disabled=true;
+    YD.api("/coupons/check",{method:"POST",body:{code,items:items()}}).then(d=>{cur=d;msg.textContent=`已套用「${d.name||d.code}」，折 ${nt(d.discount)}`;msg.style.color="var(--jade)";onChange(d);track("coupon_ok",{code:d.code})})
+    .catch(e=>{cur=null;msg.textContent=e.message;msg.style.color="#ff8a73";onChange(null)}).then(()=>{go.disabled=false})};
+  go.onclick=()=>run(inp.value.trim());inp.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();run(inp.value.trim())}};
+  return{recheck:()=>{if(cur)run(cur.code)},code:()=>cur?cur.code:null}}
 const nt=n=>"NT$"+n.toLocaleString("en-US");
 
 /* ---------------- 聲音（程式合成，無音檔） ---------------- */
@@ -677,7 +689,7 @@ async function reading(t){
   const r=S.R=buildReport(S.C,S.C2);
   chart.classList.add("read");rt.classList.add("dim","reading");shot("read");said("");
   await wait(700);
-  const pin=$("pin");pin.textContent=`直接看完整${S.mode==="year"?"流年書":S.mode==="pair"?"合盤書":"命書"} ${nt(PRICE.std)} 起`;pin.hidden=false;
+  const pin=$("pin");pin.textContent=`直接看完整${S.mode==="year"?"流年書":S.mode==="pair"?"合盤書":"命書"} ${nt(PRICE[pc("std")])} 起`;pin.hidden=false;
   pin.onclick=()=>{const t2=++token;track("pin_click");paywall(t2,true)};
   await say(`${S.name}，我看完了。從你最在意的開始說吧。`,t,{tap:true});if(t!==token)return;
   for(const [i,s] of r.secs.entries()){
@@ -711,12 +723,13 @@ function openBook(t){
     <section><h3>你的盤上已經寫好的</h3><div class="tease">${r.hooks.map(h=>`<span>${h}</span>`).join("")}</div></section>
     <section><h3>命書目錄</h3><ol class="toc">${B.toc.map(([a,b,c])=>`<li><b>${a}</b><div>${b}<small>${c}</small></div></li>`).join("")}</ol></section>
     <section><h3>點哪一盞</h3><div class="plans">
-      <label class="plan-opt"><input type="radio" name="plan" value="std" checked><div><span>點一盞燈</span><small>${S.mode==="base"?"完整命書＋附贈 1 題":"完整"+B.name.replace("夜燈・","")}・PDF 寄到你的 Email</small></div><em>${nt(PRICE.std)}</em></label>
-      <label class="plan-opt"><input type="radio" name="plan" value="vip"><div><span>長明燈</span><small>${S.mode==="base"?"完整命書＋附贈 1 題":"完整"+B.name.replace("夜燈・","")}＋追問 3 題・比分開買省 ${nt(PRICE.std+PRICE.ask3-PRICE.vip)}</small></div><em>${nt(PRICE.vip)}</em></label>
+      <label class="plan-opt"><input type="radio" name="plan" value="std" checked><div><span>點一盞燈</span><small>${S.mode==="base"?"完整命書＋附贈 1 題":"完整"+B.name.replace("夜燈・","")}・PDF 寄到你的 Email</small></div><em>${ptag(pc("std"))}</em></label>
+      <label class="plan-opt"><input type="radio" name="plan" value="vip"><div><span>長明燈</span><small>${S.mode==="base"?"完整命書＋附贈 1 題":"完整"+B.name.replace("夜燈・","")}＋追問 3 題・比分開買省 ${nt(PRICE[pc("std")]+PRICE.ask3-PRICE[pc("vip")])}</small></div><em>${ptag(pc("vip"))}</em></label>
     </div></section>
     ${S.mode==="base"?`<section><h3>附贈一題・你最想問的一件事</h3>
       <label class="mail">選填・60 字以內，命書最後會專門回答這一題<textarea id="bk-ask" maxlength="60" rows="2" placeholder="例如：${esc(askHint())}"></textarea></label>
       <p class="hint">一次只問一件事。不回答彩券號碼、投資標的、病情與官司輸贏。</p></section>`:""}
+    ${cpnHtml()}
     <label class="mail">寄送命書的 Email<input id="bk-mail" type="email" autocomplete="email" placeholder="you@example.com" value="${esc(S.email||"")}"></label>
     <div class="plans">
       <label class="check"><input type="checkbox" id="bk-ok"><span>我了解命書是依生辰即時產生的數位內容，開通後無法退款，並同意<a href="terms.html" target="_blank" rel="noopener">服務條款</a>、<a href="privacy.html" target="_blank" rel="noopener">隱私權政策</a>與<a href="refund.html" target="_blank" rel="noopener">退款政策</a>。</span></label>
@@ -729,9 +742,10 @@ function openBook(t){
   <button type="button" class="book-x" id="bk-x" aria-label="關閉命書">×</button>`;
   const pay=$("bk-pay"),err=$("bk-err");
   bk.addEventListener("input",()=>err.textContent="");bk.addEventListener("change",()=>err.textContent="");
-  const total=()=>PRICE[plan]+(add?PRICE.add:0);
+  let disc=0;const total=()=>Math.max(0,PRICE[pc(plan)]-disc);
   const upd=()=>{pay.textContent=`點燈　${nt(total())}`};upd();
-  bk.querySelectorAll('input[name="plan"]').forEach(i=>i.onchange=()=>{plan=i.value;upd();track("plan_select",{plan})});
+  const cp=cpnBind(()=>[pc(plan)],d=>{disc=d?d.discount:0;upd()});
+  bk.querySelectorAll('input[name="plan"]').forEach(i=>i.onchange=()=>{plan=i.value;upd();cp.recheck();track("plan_select",{plan})});
   bk.hidden=false;requestAnimationFrame(()=>requestAnimationFrame(()=>bk.classList.add("on")));
   const later=async()=>{track("paywall_later");closeBook();shot("face");said("");await say("燈會一直替你留著。想好了再來找我。",t);if(t!==token)return;
     const o=await chips([{label:"再看一次命書",cls:"main",v:"book"},{label:"再問一次",v:"again"}]);if(t!==token)return;
@@ -750,7 +764,7 @@ function openBook(t){
     track("plan_click",{plan,value,newsletter:$("bk-news").checked});
     const items=[S.mode==="year"?(plan==="vip"?"yvip":"ystd"):plan];
     pay.setAttribute("aria-disabled","true");pay.textContent="正在前往付款…";
-    try{await YD.checkout({items,email:mail,price_group:PRICE.group,profile:prof,gift_question:S.mode==="base"&&ask?ask:null,
+    try{await YD.checkout({items,email:mail,price_group:PRICE.group,profile:prof,coupon:cp.code(),gift_question:S.mode==="base"&&ask?ask:null,
         agree:true,newsletter:$("bk-news").checked,utm:utm()});track("checkout_redirect",{value})}
     catch(e){err.textContent=e.message||"建立訂單失敗，請稍後再試";pay.removeAttribute("aria-disabled");upd()}};
 }
@@ -859,9 +873,10 @@ function openGua(t){
       <li><b>四</b><div>你可以怎麼做<small>三件具體的事</small></div></li>
       <li><b>五</b><div>可以留意的時間<small>月份範圍・僅供參考</small></div></li></ol></section>
     <section><h3>怎麼解</h3><div class="plans">
-      <label class="plan-opt"><input type="radio" name="gplan" value="gua1" checked><div><span>解這一卦</span><small>約 1,500 字・寄到你的 Email</small></div><em>${nt(PRICE.gua1)}</em></label>
-      <label class="plan-opt"><input type="radio" name="gplan" value="gua3"><div><span>三件事一起問</span><small>解這一卦＋再問兩卦・30 天內使用・省 ${nt(PRICE.gua1*3-PRICE.gua3)}</small></div><em>${nt(PRICE.gua3)}</em></label>
+      <label class="plan-opt"><input type="radio" name="gplan" value="gua1" checked><div><span>解這一卦</span><small>約 1,500 字・寄到你的 Email</small></div><em>${ptag("gua1")}</em></label>
+      <label class="plan-opt"><input type="radio" name="gplan" value="gua3"><div><span>三件事一起問</span><small>解這一卦＋再問兩卦・30 天內使用・省 ${nt(PRICE.gua1*3-PRICE.gua3)}</small></div><em>${ptag("gua3")}</em></label>
     </div></section>
+    ${cpnHtml()}
     <label class="mail">寄送解卦的 Email<input id="bk-mail" type="email" autocomplete="email" placeholder="you@example.com" value="${esc(S.email||"")}"></label>
     <div class="plans"><label class="check"><input type="checkbox" id="bk-ok"><span>我了解解卦是依我擲出的卦即時產生的數位內容，開通後無法退款，並同意<a href="terms.html" target="_blank" rel="noopener">服務條款</a>、<a href="privacy.html" target="_blank" rel="noopener">隱私權政策</a>與<a href="refund.html" target="_blank" rel="noopener">退款政策</a>。</span></label></div>
     <section class="faq"><h3>常見問題</h3>
@@ -872,9 +887,10 @@ function openGua(t){
   </div>
   <div class="book-bar"><p class="err" id="bk-err" role="alert"></p><button type="button" class="paybtn" id="bk-pay"></button><button type="button" class="later" id="bk-later">再想想</button></div>
   <button type="button" class="book-x" id="bk-x" aria-label="關閉">×</button>`;
-  const pay=$("bk-pay"),err=$("bk-err");const upd=()=>pay.textContent=`解卦　${nt(PRICE[plan])}`;upd();
+  const pay=$("bk-pay"),err=$("bk-err");let disc=0;const upd=()=>pay.textContent=`解卦　${nt(Math.max(0,PRICE[plan]-disc))}`;upd();
+  const cp=cpnBind(()=>[plan],d=>{disc=d?d.discount:0;upd()});
   bk.addEventListener("change",()=>err.textContent="");
-  bk.querySelectorAll('input[name="gplan"]').forEach(i=>i.onchange=()=>{plan=i.value;upd();track("plan_select",{plan})});
+  bk.querySelectorAll('input[name="gplan"]').forEach(i=>i.onchange=()=>{plan=i.value;upd();cp.recheck();track("plan_select",{plan})});
   bk.hidden=false;requestAnimationFrame(()=>requestAnimationFrame(()=>bk.classList.add("on")));
   const later=async()=>{track("paywall_later",{product:"gua"});closeBook();shot("face");said("");await say("這一卦我替你記著。想好了再來找我。",t);if(t!==token)return;
     const o=await chips([{label:"再看一次",cls:"main",v:"book"},{label:"回到開頭",v:"again"}]);if(t!==token)return;o.v==="book"?(shot("hush"),openGua(t)):open()};
@@ -884,7 +900,7 @@ function openGua(t){
     if(!$("bk-ok").checked){err.textContent="請先勾選同意數位內容條款";return}
     S.email=mail;track("plan_click",{product:"gua",plan,value:PRICE[plan]});
     pay.setAttribute("aria-disabled","true");pay.textContent="正在前往付款…";
-    try{await YD.checkout({items:[plan],email:mail,price_group:PRICE.group,gua:{question:S.q,category:S.cat,lines:S.lines},
+    try{await YD.checkout({items:[plan],email:mail,price_group:PRICE.group,coupon:cp.code(),gua:{question:S.q,category:S.cat,lines:S.lines},
         agree:true,newsletter:false,utm:utm()});track("checkout_redirect",{product:"gua",value:PRICE[plan]})}
     catch(e){err.textContent=e.message||"建立訂單失敗，請稍後再試";pay.removeAttribute("aria-disabled");upd()}};
 }
