@@ -142,9 +142,10 @@ document.documentElement.classList.add('js');var io=new IntersectionObserver(fun
 (function(){try{fetch("https://api.yedeng.tw/products").then(function(r){return r.json()}).then(function(d){
   var P={};(d.items||[]).forEach(function(i){P[i.code]=i});
   document.querySelectorAll("[data-p]").forEach(function(el){var i=P[el.getAttribute("data-p")];if(!i)return;
-    var h="";if(i.promo_label)h+='<small class="promo">'+String(i.promo_label).replace(/[<>&"]/g,"")+'</small>';
-    if(i.list_price&&i.list_price>i.price)h+='<s class="was">NT$'+i.list_price.toLocaleString("en-US")+'</s>';
-    el.innerHTML=h+"NT$"+i.price.toLocaleString("en-US")});
+    var h="";if(i.list_price&&i.list_price>i.price)h+='<s class="was">NT$'+i.list_price.toLocaleString("en-US")+'</s>';
+    h+="NT$"+i.price.toLocaleString("en-US");
+    if(i.promo_label)h+='<small class="promo">'+String(i.promo_label).replace(/[<>&"]/g,"")+'</small>';
+    el.innerHTML=h});
 }).catch(function(){})}catch(e){}})();
 </script>
 </body>
