@@ -55,7 +55,7 @@
       else if(o.status==="awaiting_payment"){step(1);$("#lead").textContent="請在期限內完成繳費，金額 NT$"+o.amount.toLocaleString()+"。";$("#pay").hidden=false;
         $("#pay-kv").innerHTML=(pi.vAccount?'<dt>銀行代碼</dt><dd><span class="big-code">'+esc(pi.BankCode)+'</span></dd><dt>轉帳帳號</dt><dd><span class="big-code">'+esc(pi.vAccount)+'</span> <button class="copy" type="button" data-c="'+esc(pi.vAccount)+'">複製</button></dd>':'<dt>超商代碼</dt><dd><span class="big-code">'+esc(pi.PaymentNo)+'</span> <button class="copy" type="button" data-c="'+esc(pi.PaymentNo)+'">複製</button></dd>')+'<dt>繳費期限</dt><dd>'+esc(pi.ExpireDate)+'</dd><dt>金額</dt><dd>NT$'+o.amount.toLocaleString()+'</dd>';}
       else if(o.status==="paid"){$("#pay").hidden=true;var ready=o.reports.length&&o.reports.every(function(r){return r.token;});
-        step(ready?4:2);$("#lead").textContent=ready?"燈已經點上了，可以開始閱讀。":"付款完成，命書正在產生，通常幾分鐘內完成，完成後也會寄信通知你。";
+        step(ready?4:2);$("#lead").textContent=ready?"燈已經點上了，可以開始閱讀。":"付款完成，命書正在產生，通常 10 分鐘內完成，完成後也會寄信通知你。";
         $("#books").hidden=!o.reports.length;
         $("#l-books").innerHTML=o.reports.map(function(r){return '<li><div class="t">'+(KIND[r.kind]||"命書")+'</div>'+(r.token?'<a class="btn primary small" href="r.html#'+encodeURIComponent(r.token)+'">閱讀</a>':'<span class="chip wait"><span class="spin"></span> 產生中</span>')+'</li>';}).join("");
         if(ready){clearInterval(timer);return;}}
