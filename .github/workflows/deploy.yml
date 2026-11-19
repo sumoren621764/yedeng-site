@@ -1,0 +1,42 @@
+# 合併到 main 就自動部署到 Vercel 正式網站（yedeng.tw）
+#
+# 不用 Vercel 的 Git 連線：Vercel 帳號（zoeysusu）和 GitHub 帳號（sumoren621764）不同，
+# Hobby 方案會擋下「commit 作者不是帳號擁有者」的部署。改由這裡用權杖部署。
+#
+# 需要的設定（只做一次）：
+#   GitHub → yedeng-site → Settings → Secrets and variables → Actions → New repository secret
+#   名稱 VERCEL_TOKEN，值是 Vercel → Account Settings → Tokens 建立的權杖
+name: 部署到 Vercel
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: vercel-deploy
+  cancel-in-progress: false
+
+env:
+  VERCEL_ORG_ID: team_7f0vFVkGs4hDX0e9hQhB68u3
+  VERCEL_PROJECT_ID: prj_thaGniJj3pMynkE86ax6F4gKOA0Y
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: 部署
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          # 不帶 git 資訊上傳，避免 Hobby 方案比對 commit 作者
+          rm -rf .git
+          npx --yes vercel@latest pull --yes --environment=production --token="$VERCEL_TOKEN"
+          npx --yes vercel@latest deploy --prod --yes --token="$VERCEL_TOKEN" \
+            --meta commit="$GITHUB_SHA" --meta source=github-actions
