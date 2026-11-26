@@ -314,9 +314,9 @@ function track(event,props={}){const e={event,mode:S.mode||null,price_group:PRIC
 
 /* ---------------- 價格分組 A/B ---------------- */
 const GROUPS={a:{std:490,vip:990,add:290,ask1:290,ask3:690,gua1:99,gua3:249},b:{std:1280,vip:1980,add:650,ask1:390,ask3:890,gua1:199,gua3:490}};
-const PRICE={group:"a",...GROUPS.a,ystd:490,yvip:990},PROMO={},LIST={};  /* 先用預設值，載入後以後端 /products 為準 */
+const PRICE={group:"a",...GROUPS.a,ystd:490,yvip:990,pstd:490,pvip:990},PROMO={},LIST={};  /* 先用預設值，載入後以後端 /products 為準 */
 try{YD.api("/products").then(d=>{(d.items||[]).forEach(i=>{PRICE[i.code]=i.price;PROMO[i.code]=i.promo_label||"";LIST[i.code]=i.list_price||0})}).catch(()=>{})}catch(_){}
-const pc=p=>S.mode==="year"?(p==="vip"?"yvip":"ystd"):p;
+const pc=p=>S.mode==="year"?(p==="vip"?"yvip":"ystd"):S.mode==="pair"?(p==="vip"?"pvip":"pstd"):p;
 const ptag=c=>LIST[c]>PRICE[c]
   ?`<span class="pz"><s class="was">${nt(LIST[c])}</s><b class="now">${nt(PRICE[c])}</b>${PROMO[c]?`<small class="promo">${esc(PROMO[c])}</small>`:""}</span>`
   :`<span class="pz"><b class="now">${nt(PRICE[c])}</b>${PROMO[c]?`<small class="promo">${esc(PROMO[c])}</small>`:""}</span>`;
@@ -763,13 +763,13 @@ function openBook(t){
     const askEl=$("bk-ask"),ask=askEl?askEl.value.trim():"";
     if(ask){const bad=guaCheck(ask,true);if(bad){err.textContent="附贈的那一題："+bad;askEl.focus();return}}
     if(!$("bk-ok").checked){err.textContent="請先勾選同意數位內容條款";return}
-    if(S.mode==="pair"){err.textContent="合盤書即將開放。現在可以先點紫微命書或流年書。";return}
     const prof=profilePayload();if(!prof){err.textContent="排盤元件沒有載入完成，請重新整理後再試一次";return}
+    const partner=S.mode==="pair"?partnerPayload():null;if(S.mode==="pair"&&!partner){err.textContent="對方的命盤沒有載入完成，請重新整理後再試一次";return}
     S.email=mail;S.ask=ask;const value=total();if(ask)track("free_ask",{len:ask.length});
     track("plan_click",{plan,value,newsletter:$("bk-news").checked});
-    const items=[S.mode==="year"?(plan==="vip"?"yvip":"ystd"):plan];
+    const items=[pc(plan)];
     pay.setAttribute("aria-disabled","true");pay.textContent="正在前往付款…";
-    try{await YD.checkout({items,email:mail,price_group:PRICE.group,profile:prof,coupon:cp.code(),gift_question:S.mode==="base"&&ask?ask:null,
+    try{await YD.checkout({items,email:mail,price_group:PRICE.group,profile:prof,partner,coupon:cp.code(),gift_question:S.mode==="base"&&ask?ask:null,
         agree:true,newsletter:$("bk-news").checked,utm:utm()});track("checkout_redirect",{value})}
     catch(e){err.textContent=e.message||"建立訂單失敗，請稍後再試";pay.removeAttribute("aria-disabled");upd()}};
 }
@@ -779,6 +779,11 @@ function profilePayload(){
   const [y,m,d]=String(S.C.solar).split("-").map(Number);if(!y||!m||!d)return null;
   return{nickname:S.name,gender:S.sex==="男"?"male":"female",solar:`${y}-${String(m).padStart(2,"0")}-${String(d).padStart(2,"0")}`,
     hour_index:S.hourIdx,rel:S.rel||null,kids:S.kids||null,job:JOBMAP[S.job]||null,likes:S.like||null};
+}
+function partnerPayload(){
+  const C=S.C2;if(!C||C.demo||!C.solar||S.phourIdx==null)return null;
+  const [y,m,d]=String(C.solar).split("-").map(Number);if(!y||!m||!d)return null;
+  return{nickname:S.pname,gender:S.psex==="男"?"male":"female",solar:`${y}-${String(m).padStart(2,"0")}-${String(d).padStart(2,"0")}`,hour_index:S.phourIdx};
 }
 function utm(){const p=new URLSearchParams(location.search),u={};["utm_source","utm_medium","utm_campaign","utm_content","utm_term"].forEach(k=>{const v=p.get(k);if(v)u[k]=v.slice(0,100)});return Object.keys(u).length?u:null}
 function askHint(){if(S.mode==="pair")return"我們適合在哪一年結婚？";if(S.kids==="want")return"我們什麼時候比較適合生小孩？";
@@ -950,8 +955,12 @@ async function dialogue(preset){
     shot("hand");
     await say(`${S.pname}，是哪一天出生的？`,t);if(t!==token)return;
     S.pdob=await dobForm({y:1992,m:3,d:5,k:"other"});if(t!==token)return;said(fmtDob(S.pdob));
-    const ph=await askHour(t,`${S.pname}是什麼時辰出生的？`);if(!ph||t!==token)return;S.phour=ph.v;
+    const ph=await askHour(t,`${S.pname}是什麼時辰出生的？`);if(!ph||t!==token)return;S.phour=ph.v;S.phourIdx=ph.i;
     S.C2=computeChart(S.pdob,ph.i,S.psex);track("step_partner");
+    await say(`你和${S.pname}，現在是什麼關係？`,t);if(t!==token)return;
+    const pr=await chips([{label:"還在曖昧",v:"crush"},{label:"交往中",v:"dating"},{label:"已婚",v:"married"}]);if(t!==token)return;said(pr.label);S.rel=pr.v;track("step_rel",{rel:pr.v,pair:true});
+    if(pr.v!=="crush"){await say("你們，有小孩了嗎？",t);if(t!==token)return;
+      const kd=await chips([{label:"有了",v:"have"},{label:"還沒，想要",v:"want"},{label:"還沒，先不考慮",v:"notyet"},{label:"不想說",v:"skip"}]);if(t!==token)return;said(kd.label);S.kids=kd.v;track("step_kids",{kids:kd.v,pair:true})}
     closing=`${S.name}和${S.pname}……兩條線，我看見它們交會的地方了。`;
   }else if(S.mode==="year")closing="2027 是丁未年。我替你看看，明年的風往哪裡吹。";
   shot("close");said("");
