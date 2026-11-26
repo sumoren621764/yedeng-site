@@ -1,0 +1,20 @@
+# 開 PR 或推新 commit 到 PR 時先做基本檢查（JavaScript 語法、站內連結）；紅叉就先別合併
+name: 檢查
+
+on:
+  pull_request:
+
+concurrency:
+  group: check-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: 檢查
+        run: node .github/check.mjs
